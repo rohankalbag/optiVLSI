@@ -7,7 +7,7 @@
 of transistors, and requires computerized design automation, design verification and testing
 algorithms. Digital circuits are often represented using graphs, where the logic gates are nodes
 and their interconnections are the edges. Since VLSI circuits have millions of logic gates,
-there is a need for fast and highly optimized graph algorithms.
+there is a need for fast and highly optimized graph algorithms.*
 
 ### Collaborators
 - Rohan Rajesh Kalbag
