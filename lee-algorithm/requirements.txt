@@ -1,0 +1,5 @@
+importlib-metadata==6.1.0
+llvmlite==0.39.1
+numba==0.56.4
+numpy==1.23.5
+zipp==3.15.0

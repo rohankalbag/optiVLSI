@@ -1,0 +1,4 @@
+Lee's Algorithm
+
+make virtual environment for python : `python3 -m venv lee`
+set up libraries required for lee's algorithm: `pip install -r requirements.txt`
