@@ -1,0 +1,14 @@
+{
+  "project_name": "lee-algorithm",
+  "root": "automan",
+  "sources": [
+    "/home/rohan/Desktop/AE6102/optiVLSI/lee-algorithm"
+  ],
+  "workers": [
+    {
+      "host": "localhost",
+      "home": "",
+      "nfs": false
+    }
+  ]
+}

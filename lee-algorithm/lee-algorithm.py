@@ -189,6 +189,10 @@ if __name__ == "__main__":
     ey = args.endy
 
     maze = np.load(file + '.npz')['arr_0']
+    n = maze.shape[0]
+
+    ex = n-1 if ex >= n else ex
+    ey = n-1 if ey >= n else ey
     
     # dummy call if benchmarking
     queue_x = List()
@@ -199,7 +203,7 @@ if __name__ == "__main__":
     queue_y.append(1)
     queue_y.pop()
 
-    distance = accelerated_lee_algorithm(maze, 0, 0, 9, 9, queue_x, queue_y)
+    distance = accelerated_lee_algorithm(maze, sx, sy, ex, ey, queue_x, queue_y)
 
     if(bench):
         # benchmark for accelerated code
@@ -212,27 +216,23 @@ if __name__ == "__main__":
         queue_y.pop()
         
         x = time.perf_counter()
-        distance = accelerated_lee_algorithm(maze, 0, 0, 9, 9, queue_x, queue_y)
+        distance = accelerated_lee_algorithm(maze, sx, sx, ex, ex, queue_x, queue_y)
         x = time.perf_counter() - x
         
         # benchmark for non accelerated code
 
         y = time.perf_counter()
-        distance = lee_algorithm(maze, 0, 0, 9, 9)
+        distance = lee_algorithm(maze, sx, sx, ex, ex)
         y = time.perf_counter() - y
 
         # benchmark for networkx code
 
         z = time.perf_counter()
-        distance = lee_algorithm_networkx(maze, 0, 0, 9, 9)
+        distance = lee_algorithm_networkx(maze, sx, sx, ex, ex)
         z = time.perf_counter() - z
         
-        print(distance)
         print(x)
         print(y)
         print(z)
-
-        print(y/x)
-        print(z/x)
     else:
         print(distance)
