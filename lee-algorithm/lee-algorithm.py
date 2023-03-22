@@ -4,14 +4,17 @@ from numba import njit
 from numba.typed import List
 import time
 import networkx as nx
+import importlib  
+from create_benchmark import create_maze
+
 
 def command_line_fetcher():
     # function to fetch command line arguments
     parser = ArgumentParser(description="lee algorithm")
     
-    parser.add_argument('-m', '--maze', required=True,
-                        help="choose the maze filename for benchmarking")
-    
+    parser.add_argument('-m', '--maze', help="choose the maze filename for benchmarking")
+    parser.add_argument("-n", '--size', type=int, help="create a maze of size n to benchmark")
+    parser.add_argument("-p", '--prob', type=float, help="probability of obstacle")
     parser.add_argument('-sx', "--startx", type=int, default=0, required=True, help="start x index for algorithm")
     parser.add_argument('-sy', "--starty", type=int, default=0, required=True, help="start y index for algorithm")
 
@@ -19,6 +22,8 @@ def command_line_fetcher():
     parser.add_argument('-ey', "--endy", type=int, default=0, required=True, help="destination y index for algorithm")
     
     parser.add_argument('--b', action='store_true', help="benchmark and compare it with networkx BFS")
+    parser.add_argument('--c', action='store_true', help="create benchmark")
+    parser.add_argument('--f', action='store_true', help="use file input")
 
     return parser.parse_args()
 
@@ -180,16 +185,29 @@ def accelerated_lee_algorithm(maze, sx, sy, ex, ey, queue_x, queue_y):
 if __name__ == "__main__":
     args = command_line_fetcher()
     
-    file = args.maze
+    
     bench = args.b
+    fromfile = args.f
+    create = args.c
+
+    maze = 0
+    n = 0
+    
+    if fromfile:
+        file = args.maze
+        maze = np.load(file + '.npz')['arr_0']
+        n = maze.shape[0]
+    
+    elif create:
+        prob = args.prob
+        size = args.size
+        maze = create_maze(size, prob)
+        n = maze.shape[0]
     
     sx = args.startx
     sy = args.starty
     ex = args.endx
     ey = args.endy
-
-    maze = np.load(file + '.npz')['arr_0']
-    n = maze.shape[0]
 
     ex = n-1 if ex >= n else ex
     ey = n-1 if ey >= n else ey
