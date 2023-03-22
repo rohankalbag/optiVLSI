@@ -22,6 +22,7 @@ def create_maze(n, p):
         for j in range(n):
             if random.random() < p:
                 maze[i][j] = 1
+    maze[0, 0] = 0
     return maze
 
 if __name__ == "__main__":
