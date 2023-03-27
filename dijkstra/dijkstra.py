@@ -9,7 +9,7 @@ def command_line_fetcher():
     # function to fetch command line arguments
     parser = ArgumentParser(description="dijkstra")
     parser.add_argument(
-        '-f', '--file', help="choose the filename for saving graph as npz")
+        '-m', '--file', help="choose the filename for saving graph as npz/inputting file as npz")
     parser.add_argument("-n", '--size', type=int,
                         help="create a directed acyclic graph of n nodes")
     parser.add_argument("-p", '--prob', type=float,
@@ -17,6 +17,9 @@ def command_line_fetcher():
     parser.add_argument("-w1", '--wmin', type=int, help="min edge weight")
     parser.add_argument("-w2", '--wmax', type=int, help="max edge weight")
     parser.add_argument('--c', action='store_true', help="create graph")
+    parser.add_argument('-s', "--source", type=int, help="source node")
+    parser.add_argument('-e', "--end", type=int, help="end node")
+    parser.add_argument('--f', action='store_true', help='use npz input benchmark')
     return parser.parse_args()
 
 
@@ -35,9 +38,17 @@ def create_nx_graph(size, prob, wt_min, wt_max):
 
 def graph_to_numpy(graph):
     nodes = np.array(graph.nodes)
-    edge_list = np.array(graph.edges)
-    return (nodes, edge_list)
+    edges = graph.edges
+    edge_list = []
+    for e in edges:
+        edge_list.append((e[0], e[1], graph[e[0]][e[1]]["weight"]))
+    return (nodes, np.array(edge_list))
 
+def numpy_to_graph(nodes, edges):
+    pass
+
+def dijkstra_nx(graph, src, end):
+    pass
 
 if __name__ == "__main__":
     args = command_line_fetcher()
@@ -46,13 +57,23 @@ if __name__ == "__main__":
     p = args.prob
     w1 = args.wmin
     w2 = args.wmax
+    src = args.source
+    end = args.end
     create = args.c
+    use_file = args.f
+    G = None
+    nodes = None
+    edgelist = None
     if create:
         G = create_nx_graph(n, p, w1, w2)
         pos = nx.shell_layout(G)
         nx.draw_networkx(G, pos)
         labels = nx.get_edge_attributes(G, 'weight')
         nx.draw_networkx_edge_labels(G, pos, edge_labels=labels)
-        n, m = graph_to_numpy(G)
-        np.savez(f'{f}.npz', nodes=n, edgelist=m)
+        nodes, edgelist = graph_to_numpy(G)
+        np.savez(f'{f}.npz', nodes=nodes, edgelist=edgelist)
         plt.savefig(f"{f}.pdf")
+    elif use_file:
+        graph_data = np.load(f'{f}.npz')
+        nodes = graph_data['nodes']
+        edgelist = graph_data['edgelist']
