@@ -1,5 +1,15 @@
 # Lee's Algorithm
 
+
+## How is this useful in VLSI 
+
+-  VLSI circuits are complex integrated circuits that contain millions of transistors on a single chip. The routing process involves connecting the various components of the chip such as transistors, gates, and interconnects using metal wires to form a functional circuit.
+- Improper routing can lead to delays, signal distortion, and other issues that can result in reduced performance. A well-designed routing scheme can help minimize the area of the circuit and reduce power consumption. Proper routing helps ensure that the chip can be manufactured correctly and reliably, reducing the risk of defects and failures
+- Lee's Algorithm is used in automation of the process of routing. It is used to find the shortest path between a start point and end point (which denotes a wire connecting two nets) in a maze which can have obstacles (which could be other routes or components like transistors, gates). 
+- Other constraints can be added to Lee's Algorithm such as restriction on the angle of the turns made by the routes, number of turns .etc, to fixate upon the best solution out of the many possibilities of paths it generates.
+
+## How to setup Python environment
+
 - make virtual environment for python : `python3 -m venv lee`
 - activate virtual environment: `source lee/bin/activate`
 - set up libraries required for lee's algorithm: `pip install -r requirements.txt`
