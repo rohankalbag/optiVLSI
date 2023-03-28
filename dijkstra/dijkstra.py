@@ -17,8 +17,8 @@ def command_line_fetcher():
     parser.add_argument("-w1", '--wmin', type=int, help="min edge weight")
     parser.add_argument("-w2", '--wmax', type=int, help="max edge weight")
     parser.add_argument('--c', action='store_true', help="create graph")
-    parser.add_argument('-s', "--source", type=int, help="source node")
-    parser.add_argument('-e', "--end", type=int, help="end node")
+    parser.add_argument('-s', "--source", type=int, help="source node", required=True)
+    parser.add_argument('-e', "--end", type=int, help="end node", required=True)
     parser.add_argument('--f', action='store_true', help='use npz input benchmark')
     return parser.parse_args()
 
@@ -45,7 +45,11 @@ def graph_to_numpy(graph):
     return (nodes, np.array(edge_list))
 
 def numpy_to_graph(nodes, edges):
-    pass
+    G = nx.DiGraph()
+    G.add_nodes_from(nodes)
+    for e in edges:
+        G.add_edge(e[0], e[1], weight=e[2])
+    return G
 
 def dijkstra_nx(graph, src, end):
     pass
@@ -77,3 +81,10 @@ if __name__ == "__main__":
         graph_data = np.load(f'{f}.npz')
         nodes = graph_data['nodes']
         edgelist = graph_data['edgelist']
+        G = numpy_to_graph(nodes, edgelist)
+        pos = nx.shell_layout(G)
+        nx.draw_networkx(G, pos)
+        labels = nx.get_edge_attributes(G, 'weight')
+        nx.draw_networkx_edge_labels(G, pos, edge_labels=labels)
+        nodes, edgelist = graph_to_numpy(G)
+        plt.savefig(f"{f}.pdf")
