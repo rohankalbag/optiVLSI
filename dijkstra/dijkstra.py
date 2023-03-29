@@ -177,6 +177,8 @@ if __name__ == "__main__":
     use_file = args.f
     bench = args.b
 
+    if end >= n: end = n-1
+
     G = None
     nodes = None
     edgelist = None
@@ -253,7 +255,3 @@ if __name__ == "__main__":
         print(t1)
         print(t2)
         print(t3)
-        
-        # print speedup
-        print(t1/t3)
-        print(t2/t3)

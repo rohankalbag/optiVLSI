@@ -1,5 +1,7 @@
+automan==0.5
 contourpy==1.0.7
 cycler==0.11.0
+execnet==1.9.0
 fonttools==4.39.2
 importlib-metadata==6.1.0
 importlib-resources==5.12.0
@@ -11,6 +13,7 @@ numba==0.56.4
 numpy==1.23.5
 packaging==23.0
 Pillow==9.4.0
+psutil==5.9.4
 pyparsing==3.0.9
 python-dateutil==2.8.2
 six==1.16.0

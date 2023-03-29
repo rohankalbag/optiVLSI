@@ -1,0 +1,14 @@
+{
+  "project_name": "dijkstra",
+  "root": "automan",
+  "sources": [
+    "/home/rohan/Desktop/AE6102/optiVLSI/dijkstra"
+  ],
+  "workers": [
+    {
+      "host": "localhost",
+      "home": "",
+      "nfs": false
+    }
+  ]
+}
