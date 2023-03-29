@@ -177,7 +177,6 @@ if __name__ == "__main__":
     use_file = args.f
     bench = args.b
 
-    if end >= n: end = n-1
 
     G = None
     nodes = None
@@ -204,6 +203,9 @@ if __name__ == "__main__":
         nx.draw_networkx_edge_labels(G, pos, edge_labels=labels)
         nodes, edgelist = graph_to_numpy(G)
         plt.savefig(f"{f}.pdf")
+        n = len(nodes)
+    
+    if end >= n: end = n-1
 
     # networkx dijkstra
     t1 = time.perf_counter()
@@ -250,6 +252,25 @@ if __name__ == "__main__":
             print(py_path[1])
         if nb_path[0] > 0:
             print(nb_path[1][:: -1])
+        
+        # visualize the numba accelerated path on graph
+        G = numpy_to_graph(nodes, edgelist)
+        color_map = []
+        for node in nodes:
+            if node in nb_path[1]:
+                color_map.append('red')
+            else:
+                color_map.append('#1f78b4')
+        pos = nx.shell_layout(G)
+        nx.draw_networkx(G, pos, node_color=color_map)
+        labels = nx.get_edge_attributes(G, 'weight')
+        nx.draw_networkx_edge_labels(G, pos, edge_labels=labels)
+        nodes, edgelist = graph_to_numpy(G)
+        path = "--:>".join([str(k) for k in nb_path[1][::-1]])
+        plt.suptitle("Dijkstra's Algorithm")
+        plt.title(f"Shortest path: {path}")
+        plt.savefig(f"{f}_shortest_path.pdf")
+
     else:
         # print times
         print(t1)
