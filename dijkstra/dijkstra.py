@@ -3,7 +3,8 @@ import numpy as np
 import random
 import matplotlib.pyplot as plt
 from argparse import ArgumentParser
-
+import time
+import heapq # numba has support for heapq
 
 def command_line_fetcher():
     # function to fetch command line arguments
@@ -52,7 +53,60 @@ def numpy_to_graph(nodes, edges):
     return G
 
 def dijkstra_nx(graph, src, end):
-    pass
+    try:
+        path = nx.dijkstra_path(graph, src, end)
+        return (1, path)
+    except nx.NetworkXNoPath:
+        return (-1, [])
+
+def dijkstra_pythonic(nodes, edges, src, end):
+    visited = {}
+    distance = {}
+    next_hop = {}
+    priority_queue = []
+
+    for i in nodes:
+        visited[i] = False
+        distance[i] = np.inf
+        next_hop[i] = None
+
+    visited[src] = True
+    distance[src] = 0
+
+    adj_list = {}
+
+    for e in edges:
+        if e[0] not in adj_list.keys():
+            adj_list[e[0]] = [(e[1], e[2])]
+        else:
+            adj_list[e[0]].append((e[1], e[2]))
+
+
+    for x in adj_list[src]:
+        heapq.heappush(priority_queue, (x[1], src, x[0]))
+
+    while(len(priority_queue) > 0):
+        wt, start, n_end = heapq.heappop(priority_queue)
+        if(not visited[n_end]):
+            visited[n_end] = True
+            distance[n_end] = wt
+            next_hop[n_end] = start
+            if n_end in adj_list.keys():
+                for x in adj_list[n_end]:
+                    if not visited[x[0]]:
+                        heapq.heappush(priority_queue, (wt + x[1], n_end, x[0]))
+
+    if(not visited[end]):
+        return (-1, [])
+    else:
+        x = end
+        path = []
+        while next_hop[x] != None:
+            path.append(x)
+            x = next_hop[x]
+        path.append(x)
+        path.reverse()
+        return (1, path)
 
 if __name__ == "__main__":
     args = command_line_fetcher()
@@ -68,6 +122,7 @@ if __name__ == "__main__":
     G = None
     nodes = None
     edgelist = None
+    
     if create:
         G = create_nx_graph(n, p, w1, w2)
         pos = nx.shell_layout(G)
@@ -77,6 +132,7 @@ if __name__ == "__main__":
         nodes, edgelist = graph_to_numpy(G)
         np.savez(f'{f}.npz', nodes=nodes, edgelist=edgelist)
         plt.savefig(f"{f}.pdf")
+    
     elif use_file:
         graph_data = np.load(f'{f}.npz')
         nodes = graph_data['nodes']
@@ -88,3 +144,13 @@ if __name__ == "__main__":
         nx.draw_networkx_edge_labels(G, pos, edge_labels=labels)
         nodes, edgelist = graph_to_numpy(G)
         plt.savefig(f"{f}.pdf")
+
+    # networkx dijkstra
+
+    nx_path = dijkstra_nx(G, src, end)
+    if nx_path[0] > 0: print(nx_path[1])
+
+    # pythonic dijkstra
+
+    py_path = dijkstra_pythonic(nodes, edgelist, src, end)
+    if py_path[0] > 0: print(py_path[1])
