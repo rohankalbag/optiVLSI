@@ -23,7 +23,7 @@
 ## Usage of `dijkstra.py`
 
 ```bash
-python3 dijkstra_algorithm.py --b (optional) [--c -n size -p prob -w1 minw1 -w2 minw2 ]/[--f -m fileloc] -s start_node -e end_node   
+python3 dijkstra_algorithm.py --b (optional) [--c -n size -p prob -w1 minw1 -w2 minw2 ]/[--f] -m fileloc -s start_node -e end_node   
 ```
 - if `--c` flag is passed this script directly creates a benchmark of size n and probability p using the `gnp_random_graph()` which generates erdos renyi graphs which are DAGs (Directed Acyclic Graph)
 
