@@ -49,6 +49,12 @@ python3 dijkstra_algorithm.py --b (optional) [--c -n size -p prob -w1 minw1 -w2 
 [0, 7, 9]
 ```
 
+#### `benchmark.pdf`
+![image](https://user-images.githubusercontent.com/46604893/228672986-24113839-3e2c-4465-8584-69f212760ac7.png)
+
+#### `benchmark_shortest_path.pdf`
+![image](https://user-images.githubusercontent.com/46604893/228672930-59e1cc60-0980-4216-8d94-1c94465e94b3.png)
+
 
 `python3 dijkstra.py --c -n 10 -p 0.3 -w1 5 -w2 15 -s 0 -e 9 -m benchmark --b`
 
@@ -66,6 +72,10 @@ python3 dijkstra_algorithm.py --b (optional) [--c -n size -p prob -w1 minw1 -w2 
 
 ### Results Obtained on Benchmarking
 > Values of maze size chosen were $n \in \{10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 150, 175\}$ 
+
+![image](https://user-images.githubusercontent.com/46604893/228673076-bad51d7f-f69f-4e50-b267-59c83e7e5256.png)
+
+![image](https://user-images.githubusercontent.com/46604893/228673143-a8c2bd5c-df63-41b6-8d94-9744cbd2d608.png)
 
 
 - we see that the performance of the numba accelerated dijkstra produces a small speedup $2 \le x \le 10$ for small graphs and as the number of nodes increase the three methods nearly converge in the same time 
