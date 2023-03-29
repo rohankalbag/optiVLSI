@@ -4,7 +4,10 @@ import random
 import matplotlib.pyplot as plt
 from argparse import ArgumentParser
 import time
-import heapq # numba has support for heapq
+import heapq  # numba has support for heapq
+import numba
+from numba.typed import List
+
 
 def command_line_fetcher():
     # function to fetch command line arguments
@@ -18,9 +21,14 @@ def command_line_fetcher():
     parser.add_argument("-w1", '--wmin', type=int, help="min edge weight")
     parser.add_argument("-w2", '--wmax', type=int, help="max edge weight")
     parser.add_argument('--c', action='store_true', help="create graph")
-    parser.add_argument('-s', "--source", type=int, help="source node", required=True)
-    parser.add_argument('-e', "--end", type=int, help="end node", required=True)
-    parser.add_argument('--f', action='store_true', help='use npz input benchmark')
+    parser.add_argument('-s', "--source", type=int,
+                        help="source node", required=True)
+    parser.add_argument('-e', "--end", type=int,
+                        help="end node", required=True)
+    parser.add_argument('--f', action='store_true',
+                        help='use npz input benchmark')
+    parser.add_argument('--b', action='store_true',
+                        help='print benchmark results')
     return parser.parse_args()
 
 
@@ -31,19 +39,20 @@ def create_nx_graph(size, prob, wt_min, wt_max):
     generated = False
     while not generated:
         graph = nx.gnp_random_graph(size, prob, directed=True)
-        circuit = nx.DiGraph([(u, v, {'weight': random.randint(wt_min, wt_max)}) for (
-            u, v) in graph.edges() if u < v])
+        circuit = nx.DiGraph([(u, v, {'weight': random.randint(wt_min, wt_max)}) for
+                              (u, v) in graph.edges() if u < v])
         generated = nx.is_directed_acyclic_graph(circuit)
     return circuit
 
 
 def graph_to_numpy(graph):
-    nodes = np.array(graph.nodes)
+    nodes = np.array(graph.nodes, dtype=np.int64)
     edges = graph.edges
     edge_list = []
     for e in edges:
         edge_list.append((e[0], e[1], graph[e[0]][e[1]]["weight"]))
-    return (nodes, np.array(edge_list))
+    return (nodes, np.array(edge_list, dtype=np.int64))
+
 
 def numpy_to_graph(nodes, edges):
     G = nx.DiGraph()
@@ -52,12 +61,17 @@ def numpy_to_graph(nodes, edges):
         G.add_edge(e[0], e[1], weight=e[2])
     return G
 
-def dijkstra_nx(graph, src, end):
+
+def dijkstra_nx(nodes, edges, src, end):
+    # including time of creation of graph in networkx from numpy arrays for fairness
+    graph = numpy_to_graph(nodes, edges)
+    # actual dijkstra starts here
     try:
         path = nx.dijkstra_path(graph, src, end)
         return (1, path)
     except nx.NetworkXNoPath:
-        return (-1, [])
+        return (-1, None)
+
 
 def dijkstra_pythonic(nodes, edges, src, end):
     visited = {}
@@ -67,7 +81,7 @@ def dijkstra_pythonic(nodes, edges, src, end):
 
     for i in nodes:
         visited[i] = False
-        distance[i] = np.inf
+        distance[i] = np.iinfo(np.int64).max
         next_hop[i] = None
 
     visited[src] = True
@@ -81,23 +95,23 @@ def dijkstra_pythonic(nodes, edges, src, end):
         else:
             adj_list[e[0]].append((e[1], e[2]))
 
-
     for x in adj_list[src]:
         heapq.heappush(priority_queue, (x[1], src, x[0]))
 
-    while(len(priority_queue) > 0):
+    while (len(priority_queue) > 0):
         wt, start, n_end = heapq.heappop(priority_queue)
-        if(not visited[n_end]):
+        if (not visited[n_end]):
             visited[n_end] = True
             distance[n_end] = wt
             next_hop[n_end] = start
             if n_end in adj_list.keys():
                 for x in adj_list[n_end]:
                     if not visited[x[0]]:
-                        heapq.heappush(priority_queue, (wt + x[1], n_end, x[0]))
+                        heapq.heappush(
+                            priority_queue, (wt + x[1], n_end, x[0]))
 
-    if(not visited[end]):
-        return (-1, [])
+    if (not visited[end]):
+        return (-1, None)
     else:
         x = end
         path = []
@@ -107,6 +121,48 @@ def dijkstra_pythonic(nodes, edges, src, end):
         path.append(x)
         path.reverse()
         return (1, path)
+
+
+@numba.njit
+def dijkstra_numba_accelerated(nodes, edges, src, end, priority_queue, path):
+    # njit supports heapq
+    visited = np.zeros_like(nodes)
+    distance = np.ones_like(nodes)
+    next_hop = np.zeros_like(nodes)
+
+    next_hop.fill(-1)
+    distance.fill(np.iinfo(np.int64).max)
+
+    visited[src] = True
+    distance[src] = 0
+
+    for e in edges:
+        if e[0] == src:
+            heapq.heappush(priority_queue, (e[2], src, e[1]))
+
+    while (len(priority_queue) > 0):
+        wt, start, n_end = heapq.heappop(priority_queue)
+        if (visited[n_end] == 0):
+            visited[n_end] = 1
+            distance[n_end] = wt
+            next_hop[n_end] = start
+
+            for e in edges:
+                if e[0] == n_end:
+                    if not visited[e[1]]:
+                        heapq.heappush(
+                            priority_queue, (wt + e[2], n_end, e[1]))
+
+    if (not visited[end]):
+        return (-1, None)
+    else:
+        x = end
+        while next_hop[x] != -1:
+            path.append(x)
+            x = next_hop[x]
+        path.append(x)
+        return (1, path)
+
 
 if __name__ == "__main__":
     args = command_line_fetcher()
@@ -119,10 +175,12 @@ if __name__ == "__main__":
     end = args.end
     create = args.c
     use_file = args.f
+    bench = args.b
+
     G = None
     nodes = None
     edgelist = None
-    
+
     if create:
         G = create_nx_graph(n, p, w1, w2)
         pos = nx.shell_layout(G)
@@ -132,7 +190,7 @@ if __name__ == "__main__":
         nodes, edgelist = graph_to_numpy(G)
         np.savez(f'{f}.npz', nodes=nodes, edgelist=edgelist)
         plt.savefig(f"{f}.pdf")
-    
+
     elif use_file:
         graph_data = np.load(f'{f}.npz')
         nodes = graph_data['nodes']
@@ -146,11 +204,56 @@ if __name__ == "__main__":
         plt.savefig(f"{f}.pdf")
 
     # networkx dijkstra
-
-    nx_path = dijkstra_nx(G, src, end)
-    if nx_path[0] > 0: print(nx_path[1])
+    t1 = time.perf_counter()
+    nx_path = dijkstra_nx(nodes, edgelist, src, end)
+    t1 = time.perf_counter() - t1
 
     # pythonic dijkstra
-
+    t2 = time.perf_counter()
     py_path = dijkstra_pythonic(nodes, edgelist, src, end)
-    if py_path[0] > 0: print(py_path[1])
+    t2 = time.perf_counter() - t2
+
+    # accelerated dijkstra dummy call
+    # seeding a value into numba typed list for type inference
+    priority_queue = List()
+    priority_queue.append((1, 1, 1))
+    priority_queue.pop()
+
+    path = List()
+    path.append(1)
+    path.pop()
+
+    nb_path = dijkstra_numba_accelerated(
+        nodes, edgelist, src, end, priority_queue, path)
+
+    # accelerated dijkstra
+
+    priority_queue = List()
+    priority_queue.append((1, 1, 1))
+    priority_queue.pop()
+
+    path = List()
+    path.append(1)
+    path.pop()
+
+    t3 = time.perf_counter()
+    nb_path = dijkstra_numba_accelerated(
+        nodes, edgelist, src, end, priority_queue, path)
+    t3 = time.perf_counter() - t3
+
+    if (not bench):
+        if nx_path[0] > 0:
+            print(nx_path[1])
+        if py_path[0] > 0:
+            print(py_path[1])
+        if nb_path[0] > 0:
+            print(nb_path[1][:: -1])
+    else:
+        # print times
+        print(t1)
+        print(t2)
+        print(t3)
+        
+        # print speedup
+        print(t1/t3)
+        print(t2/t3)
