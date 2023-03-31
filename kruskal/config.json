@@ -1,0 +1,14 @@
+{
+  "project_name": "kruskal",
+  "root": "automan",
+  "sources": [
+    "/home/rohan/Desktop/AE6102/optiVLSI/kruskal"
+  ],
+  "workers": [
+    {
+      "host": "localhost",
+      "home": "",
+      "nfs": false
+    }
+  ]
+}
