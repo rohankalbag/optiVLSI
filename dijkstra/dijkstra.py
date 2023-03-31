@@ -245,34 +245,32 @@ if __name__ == "__main__":
         nodes, edgelist, src, end, priority_queue, path)
     t3 = time.perf_counter() - t3
 
-    if (not bench):
+    if (bench):
+        print(t1)
+        print(t2)
+        print(t3)
+    else:
         if nx_path[0] > 0:
             print(nx_path[1])
         if py_path[0] > 0:
             print(py_path[1])
         if nb_path[0] > 0:
             print(nb_path[1][:: -1])
-        
-        # visualize the numba accelerated path on graph
-        G = numpy_to_graph(nodes, edgelist)
-        color_map = []
-        for node in nodes:
-            if node in nb_path[1]:
-                color_map.append('red')
-            else:
-                color_map.append('#1f78b4')
-        pos = nx.shell_layout(G)
-        nx.draw_networkx(G, pos, node_color=color_map)
-        labels = nx.get_edge_attributes(G, 'weight')
-        nx.draw_networkx_edge_labels(G, pos, edge_labels=labels)
-        nodes, edgelist = graph_to_numpy(G)
-        path = "--:>".join([str(k) for k in nb_path[1][::-1]])
-        plt.suptitle("Dijkstra's Algorithm")
-        plt.title(f"Shortest path: {path}")
-        plt.savefig(f"{f}_shortest_path.pdf")
 
-    else:
-        # print times
-        print(t1)
-        print(t2)
-        print(t3)
+    # visualize the numba accelerated path on graph
+    G = numpy_to_graph(nodes, edgelist)
+    color_map = []
+    for node in nodes:
+        if node in nb_path[1]:
+            color_map.append('red')
+        else:
+            color_map.append('#1f78b4')
+    pos = nx.shell_layout(G)
+    nx.draw_networkx(G, pos, node_color=color_map)
+    labels = nx.get_edge_attributes(G, 'weight')
+    nx.draw_networkx_edge_labels(G, pos, edge_labels=labels)
+    nodes, edgelist = graph_to_numpy(G)
+    path = "--:>".join([str(k) for k in nb_path[1][::-1]])
+    plt.suptitle("Dijkstra's Algorithm")
+    plt.title(f"Shortest path: {path}")
+    plt.savefig(f"{f}_shortest_path.pdf")
