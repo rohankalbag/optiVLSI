@@ -11,7 +11,7 @@ class Lee(Problem):
 
     def setup(self):
         options = mdict(size=sizes)
-        base_cmd = 'python3 lee-algorithm.py --c -sx 0 -sy 0 -ex 5000 -ey 5000 --b -p 0.1'
+        base_cmd = 'python3 lee_algorithm.py --c -sx 0 -sy 0 -ex 5000 -ey 5000 --b -p 0.1'
         self.cases = [
             Simulation(
                 root=self.input_path(opts2path(kw)),

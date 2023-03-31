@@ -227,8 +227,7 @@ def visualize_plots(maze, visited, dist):
     plt.imshow(maze)
     plt.xlabel('x')
     plt.ylabel('y')
-    plt.savefig('manuscript/benchmark.pdf')
-    plt.savefig('manuscript/benchmark.png')
+    plt.savefig('benchmark.pdf')
     plt.close()
 
     highlight_path(ex, ey, [])
@@ -240,8 +239,7 @@ def visualize_plots(maze, visited, dist):
     plt.imshow(maze)
     plt.xlabel('x')
     plt.ylabel('y')
-    plt.savefig('manuscript/foundpath.pdf')
-    plt.savefig('manuscript/foundpath.png')
+    plt.savefig('foundpath.pdf')
     plt.close()
 
 
