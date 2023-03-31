@@ -56,8 +56,13 @@ python3 kruskal_algorithm.py --b (optional) [--c -n size -p prob -w1 minw1 -w2 m
 
 #### `graph.pdf`
 
+![image](https://user-images.githubusercontent.com/46604893/229251252-6df7354c-f0b4-4b9d-9439-aceaa1a68bb9.png)
+
 
 #### `mst.pdf`
+
+![image](https://user-images.githubusercontent.com/46604893/229251236-aa0dd368-5272-4fdc-830d-4dded43b86f3.png)
+
 
 
 
@@ -68,6 +73,10 @@ python3 kruskal_algorithm.py --b (optional) [--c -n size -p prob -w1 minw1 -w2 m
 
 ### Results Obtained on Benchmarking
 > Values of maze size chosen were $n \in \{10, 20, 50, 100, 150, 200, 350, 400, 500\}$ 
+
+![image](https://user-images.githubusercontent.com/46604893/229251284-50bae59b-3929-46ec-96d3-b3400101ffb5.png)
+
+![image](https://user-images.githubusercontent.com/46604893/229251305-957fde7e-faee-472d-9655-3560511f72a2.png)
 
 
 - the speedup wrt to the numba accelerated version seems to increase with the size of the graph and the numba accelerated is nearly 100 times faster than the networkx implementation, this may be due to the overhead of creating the graph, the numba accelerated version is nearly 50 times faster than regular pythonic implementation
