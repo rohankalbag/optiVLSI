@@ -233,9 +233,9 @@ if __name__ == "__main__":
     
     mst_edges = np.array(mst_e)
 
+    draw_mst(mst_n, mst_edges, t)
+    
     if(bench):
         print(t1)
         print(t2)
         print(t3)
-    else:
-        draw_mst(mst_n, mst_edges, t)
