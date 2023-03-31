@@ -5,7 +5,8 @@ import matplotlib.pyplot as plt
 from argparse import ArgumentParser
 import time
 import numba
-import pygraphviz
+# if facing issues for pygraphvis https://stackoverflow.com/questions/40266604/pip-install-pygraphviz-fails-failed-building-wheel-for-pygraphviz
+import pygraphviz 
 from networkx.drawing.nx_agraph import graphviz_layout
 
 def command_line_fetcher():
@@ -51,7 +52,7 @@ def graph_to_numpy(graph):
 
 
 def numpy_to_graph(nodes, edges):
-    G = nx.DiGraph()
+    G = nx.Graph() # modified to non directed from DiGraph() as Kruskal works only for Non Directed Graphs
     G.add_nodes_from(nodes)
     for e in edges:
         G.add_edge(e[0], e[1], weight=e[2])
@@ -113,11 +114,12 @@ if __name__ == "__main__":
     if create:
         plt.figure()
         G = create_nx_graph(n, p, w1, w2)
+        nodes, edgelist = graph_to_numpy(G)
+        G = numpy_to_graph(nodes, edgelist)
         pos = nx.shell_layout(G)
         nx.draw_networkx(G, pos)
         labels = nx.get_edge_attributes(G, 'weight')
         nx.draw_networkx_edge_labels(G, pos, edge_labels=labels)
-        nodes, edgelist = graph_to_numpy(G)
         np.savez(f'{f}.npz', nodes=nodes, edgelist=edgelist)
         plt.savefig(f"{f}.pdf")
     elif use_file:
