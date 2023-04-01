@@ -12,6 +12,7 @@ from numba.typed import List
 # if facing issues for pygraphvis 
 # https://stackoverflow.com/questions/40266604/pip-install-pygraphviz-fails-failed-building-wheel-for-pygraphviz
 
+
 def command_line_fetcher():
     # function to fetch command line arguments
     parser = ArgumentParser(description="dijkstra")
@@ -57,89 +58,55 @@ def graph_to_numpy(graph):
 
 
 def numpy_to_graph(nodes, edges):
-    G = nx.Graph()  # modified to non directed from DiGraph() as Kruskal works only for Non Directed Graphs
+    G = nx.Graph()
     G.add_nodes_from(nodes)
     for e in edges:
         G.add_edge(e[0], e[1], weight=e[2])
     return G
 
 
-def kruskal_pythonic(nodes, edges):
-    # create a dsu (disjoint set union)
-    # it is capable of union and find operation
-
-    parent = np.array(range(len(nodes)))
-    rank = [0]*len(nodes)
-
-    def find(i):
-        if not (parent[i] == i):
-            parent[i] = find(parent[i])
-        return parent[i]
-
-    def union(i, j):
-        x, y = find(i), find(j)
-        if rank[x] < rank[y]:
-            parent[x] = y
-        elif rank[x] > rank[y]:
-            parent[y] = x
-        else:
-            parent[x] = y
-            rank[y] += 1
-
+def prim_pythonic(nodes, edges):
     mst = []
-    wts = edges[:, 2]
-    sorted_indices = np.argsort(wts)
-    sorted_edges = edges[sorted_indices]
-
-    for e in sorted_edges:
-        src, end, wt = e
-        if find(src) != find(end):
-            union(src, end)
-            mst.append(e)
+    visited = []
+    curr_node = nodes[0]
+    visited.append(curr_node)
+    cond1 = [False]*len(edges[:, 0])
+    cond2 = [False]*len(edges[:, 0])
+    while (~((cond1 & cond2) == [True]*len(edges[:, 0]))):
+        cond1 = cond1 | (edges[:, 0] == curr_node)
+        cond2 = cond2 | (edges[:, 1] == curr_node)
+        connected_edges = edges[cond1 & (~cond2), :]
+        connected_edges_wts = connected_edges[:, 2]
+        min_wt_index = np.argmin(connected_edges_wts)
+        visited.append(connected_edges[min_wt_index])
+        mst.append(connected_edges[min_wt_index])
 
     return (nodes, np.array(mst))
 
 
-def kruskal_networkx(nodes, edges):
+def prim_networkx(nodes, edges):
     graph = numpy_to_graph(nodes, edges)
-    mst = nx.minimum_spanning_tree(graph)
+    mst = nx.minimum_spanning_tree(graph, algorithm='prim')
     n, e = graph_to_numpy(mst)
     return (n, e)
 
-@numba.njit
-def find(i, parent):
-    if not (parent[i] == i):
-        parent[i] = find(parent[i], parent)
-    return parent[i]
 
 @numba.njit
-def union(i, j, rank, parent):
-    x, y = find(i, parent), find(j, parent)
-    if rank[x] < rank[y]:
-        parent[x] = y
-    elif rank[x] > rank[y]:
-        parent[y] = x
-    else:
-        parent[x] = y
-        rank[y] += 1
-    
-@numba.njit
-def kruskal_numba_accelerated(nodes, edges, mst):
-    # create a dsu (disjoint set union)
-    # it is capable of union and find operation
-    
-    parent = np.copy(nodes)
-    rank = np.zeros_like(nodes)
-
-    wts = edges[:, 2]
-    sorted_indices = np.argsort(wts)
-    sorted_edges = edges[sorted_indices]
-
-    for e in sorted_edges:
-        src, end, wt = e
-        if find(src, parent) != find(end, parent):
-            union(src, end, rank, parent)
-            mst.append((e[0], e[1], e[2]))
+def prim_numba_accelerated(nodes, edges, mst):
+    mst = []
+    visited = []
+    curr_node = nodes[0]
+    visited.append(curr_node)
+    cond1 = [False]*len(edges[:, 0])
+    cond2 = [False]*len(edges[:, 0])
+    while (~((cond1 & cond2) == [True]*len(edges[:, 0]))):
+        cond1 = cond1 | (edges[:, 0] == curr_node)
+        cond2 = cond2 | (edges[:, 1] == curr_node)
+        connected_edges = edges[cond1 & (~cond2), :]
+        connected_edges_wts = connected_edges[:, 2]
+        min_wt_index = np.argmin(connected_edges_wts)
+        visited.append(connected_edges[min_wt_index])
+        mst.append(connected_edges[min_wt_index])
 
     return (nodes, mst)
 
@@ -153,7 +120,6 @@ def draw_mst(mst_n, mst_edges, t):
     nx.draw_networkx_edge_labels(G, pos, edge_labels=labels)
     plt.savefig(f"{t}.pdf")
     np.savez(f'{t}.npz', nodes=mst_n, edgelist=mst_edges)
-
 
 
 if __name__ == "__main__":
@@ -173,7 +139,7 @@ if __name__ == "__main__":
     edgelist = None
 
     if create:
-        
+
         plt.figure()
         G = create_nx_graph(n, p, w1, w2)
         nodes, edgelist = graph_to_numpy(G)
@@ -184,9 +150,9 @@ if __name__ == "__main__":
         nx.draw_networkx_edge_labels(G, pos, edge_labels=labels)
         np.savez(f'{f}.npz', nodes=nodes, edgelist=edgelist)
         plt.savefig(f"{f}.pdf")
-    
+
     elif use_file:
-        
+
         plt.figure()
         graph_data = np.load(f'{f}.npz')
         nodes = graph_data['nodes']
@@ -198,44 +164,36 @@ if __name__ == "__main__":
         nx.draw_networkx_edge_labels(G, pos, edge_labels=labels)
         plt.savefig(f"{f}.pdf")
         n = len(nodes)
-    
+
     t1 = time.perf_counter()
-    mst_n, mst_edges = kruskal_pythonic(nodes, edgelist)
+    mst_n, mst_edges = prim_pythonic(nodes, edgelist)
     t1 = time.perf_counter() - t1 
 
     t2 = time.perf_counter()
-    mst_n, mst_edges = kruskal_networkx(nodes, edgelist)
+    mst_n, mst_edges = prim_networkx(nodes, edgelist)
     t2 = time.perf_counter() - t2 
-
-    
-    # dummy calls for numba
-    parent = np.array(range(len(nodes)))
-    rank = np.zeros_like(nodes)
-
-    find(0, parent)
-    union(0, 1, rank, parent)
 
     mst = List()
     mst.append((1, 1, 1))
     mst.pop()
 
-    kruskal_numba_accelerated(nodes, edgelist, mst)
+    prim_numba_accelerated(nodes, edgelist, mst)
 
     # actual numba call
-   
+
     mst = List()
     mst.append((1, 1, 1))
     mst.pop()
 
     t3 = time.perf_counter()
-    mst_n, mst_e = kruskal_numba_accelerated(nodes, edgelist, mst)
+    mst_n, mst_e = prim_numba_accelerated(nodes, edgelist, mst)
     t3 = time.perf_counter() - t3
-   
+
     mst_edges = np.array(mst_e)
 
     draw_mst(mst_n, mst_edges, t)
-  
-    if(bench):
+
+    if (bench):
         print(t1)
         print(t2)
         print(t3)
