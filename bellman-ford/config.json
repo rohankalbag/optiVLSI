@@ -1,0 +1,14 @@
+{
+  "project_name": "bellman-ford",
+  "root": "automan",
+  "sources": [
+    "/home/neeraj/Documents/AE6102/Project/optiVLSI/bellman-ford"
+  ],
+  "workers": [
+    {
+      "host": "localhost",
+      "home": "",
+      "nfs": false
+    }
+  ]
+}
