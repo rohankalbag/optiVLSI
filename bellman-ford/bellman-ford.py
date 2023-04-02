@@ -11,7 +11,7 @@ from numba.typed import List
 
 def command_line_fetcher():
     # function to fetch command line arguments
-    parser = ArgumentParser(description="dijkstra")
+    parser = ArgumentParser(description="bellman-ford")
     parser.add_argument(
         '-m', '--file', help="choose the filename for saving graph as npz/inputting file as npz")
     parser.add_argument("-n", '--size', type=int,
@@ -39,8 +39,9 @@ def create_nx_graph(size, prob, wt_min, wt_max):
     generated = False
     while not generated:
         graph = nx.gnp_random_graph(size, prob, directed=True)
-        circuit = nx.DiGraph([(u, v, {'weight': random.randint(wt_min, wt_max)}) for
-                              (u, v) in graph.edges() if u < v])
+        circuit = nx.DiGraph([(u, v,
+                               {'weight': random.randint(wt_min, wt_max)})
+                              for (u, v) in graph.edges() if u < v])
         generated = nx.is_directed_acyclic_graph(circuit)
     return circuit
 
@@ -94,12 +95,13 @@ def bellman_ford_pythonic(nodes, edges, src, end):
         while (curr_node != src):
             curr_node = prev_node[curr_node]
             path.append(curr_node)
-        return (1, path.reverse())
+        return (1, path[::-1])
 
 
 @numba.njit
 def bellman_ford_numba_accelerated(nodes, edges, src, end, path):
-    dist = [float("Inf")] * len(nodes)
+    dist = np.ones_like(nodes)
+    dist.fill(np.iinfo(np.int64).max)
     dist[src] = 0
     prev_node = np.zeros_like(nodes)
     prev_node.fill(-1)
@@ -108,7 +110,7 @@ def bellman_ford_numba_accelerated(nodes, edges, src, end, path):
 
     for i in range(len(nodes)-1):
         for e in edges:
-            if dist[e[0]] != float("Inf") and dist[e[0]] + e[2] < dist[e[1]]:
+            if dist[e[0]] != np.iinfo(np.int64).max and dist[e[0]] + e[2] < dist[e[1]]:
                 dist[e[1]] = dist[e[0]] + e[2]
                 prev_node[e[1]] = e[0]
 
@@ -119,7 +121,7 @@ def bellman_ford_numba_accelerated(nodes, edges, src, end, path):
         while (curr_node != src):
             curr_node = prev_node[curr_node]
             path.append(curr_node)
-        return (1, path.reverse())
+        return (1, path[::-1])
 
 
 if __name__ == "__main__":
@@ -142,11 +144,13 @@ if __name__ == "__main__":
 
     if create:
         G = create_nx_graph(n, p, w1, w2)
+        nodes, edgelist = graph_to_numpy(G)
+        G = numpy_to_graph(nodes, edgelist)
         pos = nx.shell_layout(G)
         nx.draw_networkx(G, pos)
         labels = nx.get_edge_attributes(G, 'weight')
         nx.draw_networkx_edge_labels(G, pos, edge_labels=labels)
-        nodes, edgelist = graph_to_numpy(G)
+        # nodes, edgelist = graph_to_numpy(G)
         np.savez(f'{f}.npz', nodes=nodes, edgelist=edgelist)
         plt.savefig(f"{f}.pdf")
 
@@ -175,24 +179,14 @@ if __name__ == "__main__":
     py_path = bellman_ford_pythonic(nodes, edgelist, src, end)
     t2 = time.perf_counter() - t2
 
-    # accelerated bellman_ford dummy call
-    # seeding a value into numba typed list for type inference
-    priority_queue = List()
-    priority_queue.append((1, 1, 1))
-    priority_queue.pop()
-
     path = List()
     path.append(1)
     path.pop()
 
     nb_path = bellman_ford_numba_accelerated(
-        nodes, edgelist, src, end, priority_queue, path)
+        nodes, edgelist, src, end, path)
 
     # accelerated bellman_ford
-
-    priority_queue = List()
-    priority_queue.append((1, 1, 1))
-    priority_queue.pop()
 
     path = List()
     path.append(1)
@@ -200,7 +194,7 @@ if __name__ == "__main__":
 
     t3 = time.perf_counter()
     nb_path = bellman_ford_numba_accelerated(
-        nodes, edgelist, src, end, priority_queue, path)
+        nodes, edgelist, src, end, path)
     t3 = time.perf_counter() - t3
 
     if (bench):
@@ -213,13 +207,13 @@ if __name__ == "__main__":
         if py_path[0] > 0:
             print(py_path[1])
         if nb_path[0] > 0:
-            print(nb_path[1][:: -1])
+            print(nb_path[1])
 
     # visualize the numba accelerated path on graph
     G = numpy_to_graph(nodes, edgelist)
     color_map = []
     for node in nodes:
-        if node in nb_path[1]:
+        if node in py_path[1]:
             color_map.append('red')
         else:
             color_map.append('#1f78b4')
@@ -228,7 +222,7 @@ if __name__ == "__main__":
     labels = nx.get_edge_attributes(G, 'weight')
     nx.draw_networkx_edge_labels(G, pos, edge_labels=labels)
     nodes, edgelist = graph_to_numpy(G)
-    path = "--:>".join([str(k) for k in nb_path[1][::-1]])
+    path = "--:>".join([str(k) for k in py_path[1]])
     plt.suptitle("Bellman Ford Algorithm")
     plt.title(f"Shortest path: {path}")
     plt.savefig(f"{f}_shortest_path.pdf")
