@@ -15,7 +15,7 @@ from numba.typed import List
 
 def command_line_fetcher():
     # function to fetch command line arguments
-    parser = ArgumentParser(description="dijkstra")
+    parser = ArgumentParser(description="prim")
     parser.add_argument(
         '-m', '--file', help="choose the filename for saving graph as npz/input file as npz")
     parser.add_argument(
@@ -66,20 +66,37 @@ def numpy_to_graph(nodes, edges):
 
 
 def prim_pythonic(nodes, edges):
+    print(edges)
     mst = []
     visited = []
     curr_node = nodes[0]
     visited.append(curr_node)
-    cond1 = [False]*len(edges[:, 0])
-    cond2 = [False]*len(edges[:, 0])
-    while (~((cond1 & cond2) == [True]*len(edges[:, 0]))):
-        cond1 = cond1 | (edges[:, 0] == curr_node)
-        cond2 = cond2 | (edges[:, 1] == curr_node)
+    cond1 = np.array([False]*len(edges[:, 0]))
+    cond2 = np.array([False]*len(edges[:, 0]))
+
+    cond1 = cond1 | (edges[:, 0] == curr_node)
+    cond2 = cond2 | (edges[:, 1] == curr_node)
+
+    while (any((~cond1) | (~cond2))):
+
+        if (all((~cond1) | (cond2))):
+            print("here")
+            curr_node = edges[~cond1, 0][0]
+            print(edges[~cond1, 0])
+            cond1 = cond1 | (edges[:, 0] == curr_node)
+            cond2 = cond2 | (edges[:, 1] == curr_node)
+
         connected_edges = edges[cond1 & (~cond2), :]
         connected_edges_wts = connected_edges[:, 2]
         min_wt_index = np.argmin(connected_edges_wts)
-        visited.append(connected_edges[min_wt_index])
-        mst.append(connected_edges[min_wt_index])
+        visited.append(connected_edges[min_wt_index, 1])
+        curr_node = connected_edges[min_wt_index, 1]
+        mst.append(connected_edges[min_wt_index, :])
+
+        print(visited)
+
+        cond1 = cond1 | (edges[:, 0] == curr_node)
+        cond2 = cond2 | (edges[:, 1] == curr_node)
 
     return (nodes, np.array(mst))
 
@@ -97,16 +114,28 @@ def prim_numba_accelerated(nodes, edges, mst):
     visited = []
     curr_node = nodes[0]
     visited.append(curr_node)
-    cond1 = [False]*len(edges[:, 0])
-    cond2 = [False]*len(edges[:, 0])
-    while (~((cond1 & cond2) == [True]*len(edges[:, 0]))):
-        cond1 = cond1 | (edges[:, 0] == curr_node)
-        cond2 = cond2 | (edges[:, 1] == curr_node)
+    cond1 = np.array([False]*len(edges[:, 0]))
+    cond2 = np.array([False]*len(edges[:, 0]))
+
+    cond1 = cond1 | (edges[:, 0] == curr_node)
+    cond2 = cond2 | (edges[:, 1] == curr_node)
+
+    for i in range(len(nodes)):
+
+        if (np.all((~cond1) | (cond2))):
+            curr_node = edges[~cond1, 0][0]
+            cond1 = cond1 | (edges[:, 0] == curr_node)
+            cond2 = cond2 | (edges[:, 1] == curr_node)
+
         connected_edges = edges[cond1 & (~cond2), :]
         connected_edges_wts = connected_edges[:, 2]
         min_wt_index = np.argmin(connected_edges_wts)
-        visited.append(connected_edges[min_wt_index])
-        mst.append(connected_edges[min_wt_index])
+        visited.append(connected_edges[min_wt_index, 1])
+        curr_node = connected_edges[min_wt_index, 1]
+        mst.append(connected_edges[min_wt_index, :])
+
+        cond1 = cond1 | (edges[:, 0] == curr_node)
+        cond2 = cond2 | (edges[:, 1] == curr_node)
 
     return (nodes, mst)
 
