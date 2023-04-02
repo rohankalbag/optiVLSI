@@ -74,23 +74,16 @@ def prim_pythonic(nodes, edges):
     cond2 = cond2 | (edges[:, 1] == curr_node)
 
     while (any((~cond1) | (~cond2))):
-
-        if (all((~cond1) | (cond2))):
-            curr_node = edges[~cond1, 0][0]
-            cond1 = cond1 | (edges[:, 0] == curr_node)
-            cond2 = cond2 | (edges[:, 1] == curr_node)
-
-        connected_edges = edges[cond1 & (~cond2), :]
-        if (np.size(connected_edges) == 0):
-            cond3 = (edges[:, 0] == curr_node)
-            connected_edges = edges[cond3, :]
-
+        connected_edges = edges[(cond1 & (~cond2)) | ((~cond1) & (cond2)), :]
         connected_edges_wts = connected_edges[:, 2]
         min_wt_index = np.argmin(connected_edges_wts)
         visited.append(connected_edges[min_wt_index, 1])
         curr_node = connected_edges[min_wt_index, 1]
         mst.append(connected_edges[min_wt_index, :])
 
+        cond1 = cond1 | (edges[:, 0] == curr_node)
+        cond2 = cond2 | (edges[:, 1] == curr_node)
+        curr_node = connected_edges[min_wt_index, 0]
         cond1 = cond1 | (edges[:, 0] == curr_node)
         cond2 = cond2 | (edges[:, 1] == curr_node)
 
@@ -120,23 +113,17 @@ def prim_numba_accelerated(nodes, edges, mst):
 
         if (~(np.any((~cond1) | (~cond2)))):
             break
-
-        if (np.all((~cond1) | (cond2))):
-            curr_node = edges[~cond1, 0][0]
-            cond1 = cond1 | (edges[:, 0] == curr_node)
-            cond2 = cond2 | (edges[:, 1] == curr_node)
-
-        connected_edges = edges[cond1 & (~cond2), :]
-        if (len(connected_edges) == 0):
-            cond3 = (edges[:, 0] == curr_node)
-            connected_edges = edges[cond3, :]
-
+        
+        connected_edges = edges[(cond1 & (~cond2)) | ((~cond1) & (cond2)), :]
         connected_edges_wts = connected_edges[:, 2]
         min_wt_index = np.argmin(connected_edges_wts)
         visited.append(connected_edges[min_wt_index, 1])
         curr_node = connected_edges[min_wt_index, 1]
         mst.append(connected_edges[min_wt_index, :])
 
+        cond1 = cond1 | (edges[:, 0] == curr_node)
+        cond2 = cond2 | (edges[:, 1] == curr_node)
+        curr_node = connected_edges[min_wt_index, 0]
         cond1 = cond1 | (edges[:, 0] == curr_node)
         cond2 = cond2 | (edges[:, 1] == curr_node)
 
