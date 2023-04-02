@@ -6,18 +6,14 @@ import random
 import matplotlib.pyplot as plt
 from argparse import ArgumentParser
 from networkx.drawing.nx_agraph import graphviz_layout
-import pygraphviz
 from numba.typed import List
-
-# if facing issues for pygraphvis 
-# https://stackoverflow.com/questions/40266604/pip-install-pygraphviz-fails-failed-building-wheel-for-pygraphviz
 
 
 def command_line_fetcher():
     # function to fetch command line arguments
     parser = ArgumentParser(description="prim")
     parser.add_argument(
-        '-m', '--file', help="choose the filename for saving graph as npz/input file as npz")
+        '-m', '--file', help="choose the filename for saving graph as npz")
     parser.add_argument(
         '-t', '--mst', help="store the mst finally here")
     parser.add_argument("-n", '--size', type=int,
@@ -41,8 +37,9 @@ def create_nx_graph(size, prob, wt_min, wt_max):
     generated = False
     while not generated:
         graph = nx.gnp_random_graph(size, prob, directed=True)
-        circuit = nx.DiGraph([(u, v, {'weight': random.randint(wt_min, wt_max)}) for
-                              (u, v) in graph.edges() if u < v])
+        circuit = nx.DiGraph([(u, v,
+                               {'weight': random.randint(wt_min, wt_max)})
+                              for (u, v) in graph.edges() if u < v])
         generated = nx.is_directed_acyclic_graph(circuit)
     return circuit
 
@@ -66,7 +63,6 @@ def numpy_to_graph(nodes, edges):
 
 
 def prim_pythonic(nodes, edges):
-    print(edges)
     mst = []
     visited = []
     curr_node = nodes[0]
@@ -80,20 +76,20 @@ def prim_pythonic(nodes, edges):
     while (any((~cond1) | (~cond2))):
 
         if (all((~cond1) | (cond2))):
-            print("here")
             curr_node = edges[~cond1, 0][0]
-            print(edges[~cond1, 0])
             cond1 = cond1 | (edges[:, 0] == curr_node)
             cond2 = cond2 | (edges[:, 1] == curr_node)
 
         connected_edges = edges[cond1 & (~cond2), :]
+        if (np.size(connected_edges) == 0):
+            cond3 = (edges[:, 0] == curr_node)
+            connected_edges = edges[cond3, :]
+
         connected_edges_wts = connected_edges[:, 2]
         min_wt_index = np.argmin(connected_edges_wts)
         visited.append(connected_edges[min_wt_index, 1])
         curr_node = connected_edges[min_wt_index, 1]
         mst.append(connected_edges[min_wt_index, :])
-
-        print(visited)
 
         cond1 = cond1 | (edges[:, 0] == curr_node)
         cond2 = cond2 | (edges[:, 1] == curr_node)
@@ -122,12 +118,19 @@ def prim_numba_accelerated(nodes, edges, mst):
 
     for i in range(len(nodes)):
 
+        if (~(np.any((~cond1) | (~cond2)))):
+            break
+
         if (np.all((~cond1) | (cond2))):
             curr_node = edges[~cond1, 0][0]
             cond1 = cond1 | (edges[:, 0] == curr_node)
             cond2 = cond2 | (edges[:, 1] == curr_node)
 
         connected_edges = edges[cond1 & (~cond2), :]
+        if (len(connected_edges) == 0):
+            cond3 = (edges[:, 0] == curr_node)
+            connected_edges = edges[cond3, :]
+
         connected_edges_wts = connected_edges[:, 2]
         min_wt_index = np.argmin(connected_edges_wts)
         visited.append(connected_edges[min_wt_index, 1])
@@ -196,11 +199,11 @@ if __name__ == "__main__":
 
     t1 = time.perf_counter()
     mst_n, mst_edges = prim_pythonic(nodes, edgelist)
-    t1 = time.perf_counter() - t1 
+    t1 = time.perf_counter() - t1
 
     t2 = time.perf_counter()
     mst_n, mst_edges = prim_networkx(nodes, edgelist)
-    t2 = time.perf_counter() - t2 
+    t2 = time.perf_counter() - t2
 
     mst = List()
     mst.append((1, 1, 1))
