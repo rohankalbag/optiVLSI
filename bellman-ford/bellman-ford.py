@@ -4,7 +4,6 @@ import random
 import matplotlib.pyplot as plt
 from argparse import ArgumentParser
 import time
-import heapq  # numba has support for heapq
 import numba
 from numba.typed import List
 
