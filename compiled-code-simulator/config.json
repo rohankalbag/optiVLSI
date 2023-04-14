@@ -1,0 +1,14 @@
+{
+  "project_name": "compiled-code-simulator",
+  "root": "automan",
+  "sources": [
+    "/home/rohan/Desktop/AE6102/optiVLSI/compiled-code-simulator"
+  ],
+  "workers": [
+    {
+      "host": "localhost",
+      "home": "",
+      "nfs": false
+    }
+  ]
+}
