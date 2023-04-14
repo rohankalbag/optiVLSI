@@ -4,7 +4,7 @@ from argparse import ArgumentParser
 
 def command_line_fetcher():
     # function to fetch command line arguments
-    parser = ArgumentParser(description="dijkstra")
+    parser = ArgumentParser(description="ccsim")
     parser.add_argument(
         '-c', '--circuit', help="circuit filename")
     parser.add_argument("-t", '--truthtable', help="save final truthtable")
@@ -290,7 +290,7 @@ if __name__ == '__main__':
     # list performs cartesian product no of input number of times to provide inputs of generic n variable truth table in order
     testvectors = list(product((0, 1), repeat=len(inputs)))
     circuit = generate_circuit(f"{circuitfile}.txt")
-    
+
     for i in testvectors:
         for j in range(len(i)):
             truthtable[inputs[j]].append(i[j])
