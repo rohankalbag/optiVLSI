@@ -1,0 +1,10 @@
+* code to describe a full adder
+
+inp A B C
+outp Sum Cout 
+
+xor A B 1
+xor 1 C Sum
+and 1 C 2
+and A B 3
+or 2 3 Cout
