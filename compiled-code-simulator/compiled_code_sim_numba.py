@@ -5,6 +5,8 @@ import numba
 import numpy as np
 import time
 
+timebench = 0
+
 def command_line_fetcher():
     # function to fetch command line arguments
     parser = ArgumentParser(description="ccsim")
@@ -208,6 +210,7 @@ def compiled_code_accelerated_numba(nets, gates, gatetype, associated_nets):
 
 
 def simulate(testvector, circuit):
+    global timebench
     """simulates the circuit stored at ./filename for an input of testvector and returns output vector"""
     
     net_hashmap = circuit[0]
@@ -221,7 +224,25 @@ def simulate(testvector, circuit):
     for i in range(len(testvector)):
         nets[net_hashmap[inputs[i]]] = testvector[i]
 
+    #dummy call
     compiled_code_accelerated_numba(nets, gates, gatetype, associated_nets)
+
+    net_hashmap = circuit[0]
+    nets = np.array(circuit[1], dtype=np.int32)
+    gates = np.array(circuit[2], dtype=np.int32)
+    gatetype = np.array(circuit[3], dtype=np.int32) 
+    inputs = circuit[4]
+    outputs = circuit[5]
+    associated_nets = np.array(circuit[6], dtype=np.int32)
+
+    for i in range(len(testvector)):
+        nets[net_hashmap[inputs[i]]] = testvector[i]
+
+    time_bench = time.perf_counter()
+    compiled_code_accelerated_numba(nets, gates, gatetype, associated_nets)
+    time_bench = time.perf_counter() - time_bench
+
+    timebench += time_bench 
 
     output_testvector = []
     
@@ -251,7 +272,6 @@ if __name__ == '__main__':
     testvectors = list(product((0, 1), repeat=len(inputs)))
     circuit = generate_circuit(f"{circuitfile}.txt")
 
-    #dummy call for numba
     for i in testvectors:
         for j in range(len(i)):
             truthtable[inputs[j]].append(i[j])
@@ -260,30 +280,9 @@ if __name__ == '__main__':
 
         for j in range(len(v)):
             truthtable[outputs[j]].append(v[j])
-    
-    
-    truthtable = {}
-
-    for j in range(len(inputs)):
-        truthtable[inputs[j]] = []
-
-    for j in range(len(outputs)):
-        truthtable[outputs[j]] = []
-    
-    #actual benchmark
-    time_bench = time.perf_counter()
-    for i in testvectors:
-        for j in range(len(i)):
-            truthtable[inputs[j]].append(i[j])
-        # simulate the ith truthtable entry
-        v = simulate(i, circuit)
-
-        for j in range(len(v)):
-            truthtable[outputs[j]].append(v[j])
-    time_bench = time.perf_counter() - time_bench
 
     if bench:
-        print(time_bench)
+        print(timebench)
 
     # use pandas to convert to csv and store
     truthtable = pd.DataFrame(truthtable)

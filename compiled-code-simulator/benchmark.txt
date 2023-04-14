@@ -1,17 +1,9 @@
-inp 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15
-outp 30
-and 0 1 16
-and 2 3 17
-and 4 5 18
-and 6 7 19
-and 8 9 20
-and 10 11 21
-and 12 13 22
-and 14 15 23
-and 16 17 24
-and 18 19 25
-and 20 21 26
-and 22 23 27
-and 24 25 28
-and 26 27 29
-and 28 29 30
+inp 0 1 2 3 4 5 6 7
+outp 14
+and 0 1 8
+and 2 3 9
+and 4 5 10
+and 6 7 11
+and 8 9 12
+and 10 11 13
+and 12 13 14

@@ -2,6 +2,7 @@ from itertools import product
 import pandas as pd
 from argparse import ArgumentParser
 import time
+timebench = 0
 
 def command_line_fetcher():
     # function to fetch command line arguments
@@ -246,23 +247,16 @@ def simulate(testvector, circuit):
     # assign the testvector to input nets
     for i in range(len(testvector)):
         nets[inputs[i]] = testvector[i]
-
-    # create a list of hash_keys of all gates which are yet to be simulated
-    left_over_gates = list(range(len(gates.keys())))
-    while (len(left_over_gates) > 0):
-        # keep performing until no left over gates
-        completed = []
-
-        for i in left_over_gates:
-            # check if a gate is ready to be evaluated if so add it to completed
-            if (gates[i].ready(nets)):
-                completed.append(i)
-
-        for i in completed:
-            # evaluate all gates in completed and remove them from left over gates
-            gates[i].evaluate(nets)
-            left_over_gates.remove(i)
-
+    
+    gate_done = [-1]*len(gates.keys())
+    while (sum(gate_done) < 0):
+        for i in gates.keys():
+            if(gates[i].ready(nets)):
+                gates[i].evaluate(nets)
+                gate_done[i] = 0
+            else:
+                continue
+    
     output_testvector = []
 
     for i in outputs:
@@ -294,20 +288,22 @@ if __name__ == '__main__':
     testvectors = list(product((0, 1), repeat=len(inputs)))
     circuit = generate_circuit(f"{circuitfile}.txt")
 
-    time_bench = time.perf_counter()
     for i in testvectors:
         for j in range(len(i)):
             truthtable[inputs[j]].append(i[j])
         # simulate the ith truthtable entry
+        time_bench = time.perf_counter()
         v = simulate(i, circuit)
+        time_bench = time.perf_counter() - time_bench
+
+        timebench += time_bench
 
         for j in range(len(v)):
             truthtable[outputs[j]].append(v[j])
-    time_bench = time.perf_counter() - time_bench
 
     # use pandas to convert to csv and store
     truthtable = pd.DataFrame(truthtable)
     truthtable.to_csv(f"{truthtablefile}.csv", index=False)
 
     if bench:
-        print(time_bench)
+        print(timebench)
