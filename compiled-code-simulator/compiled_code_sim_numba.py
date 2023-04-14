@@ -3,6 +3,7 @@ import pandas as pd
 from argparse import ArgumentParser
 import numba
 import numpy as np
+import time
 
 def command_line_fetcher():
     # function to fetch command line arguments
@@ -10,6 +11,7 @@ def command_line_fetcher():
     parser.add_argument(
         '-c', '--circuit', help="circuit filename")
     parser.add_argument("-t", '--truthtable', help="save final truthtable")
+    parser.add_argument('--b', action='store_true', help='print benchmark results')
     return parser.parse_args()
 
 def get_input_output_nodes(filename):
@@ -232,6 +234,7 @@ if __name__ == '__main__':
     args = command_line_fetcher()
     circuitfile = args.circuit
     truthtablefile = args.truthtable
+    bench = args.b
 
     inputs, outputs = get_input_output_nodes(f"{circuitfile}.txt")
 
@@ -248,6 +251,7 @@ if __name__ == '__main__':
     testvectors = list(product((0, 1), repeat=len(inputs)))
     circuit = generate_circuit(f"{circuitfile}.txt")
 
+    #dummy call for numba
     for i in testvectors:
         for j in range(len(i)):
             truthtable[inputs[j]].append(i[j])
@@ -256,6 +260,21 @@ if __name__ == '__main__':
 
         for j in range(len(v)):
             truthtable[outputs[j]].append(v[j])
+    
+    time_bench = time.perf_counter()
+    #actual benchmark
+    for i in testvectors:
+        for j in range(len(i)):
+            truthtable[inputs[j]].append(i[j])
+        # simulate the ith truthtable entry
+        v = simulate(i, circuit)
+
+        for j in range(len(v)):
+            truthtable[outputs[j]].append(v[j])
+    time_bench = time.perf_counter() - time_bench
+
+    if bench:
+        print(time_bench)
 
     # use pandas to convert to csv and store
     truthtable = pd.DataFrame(truthtable)
