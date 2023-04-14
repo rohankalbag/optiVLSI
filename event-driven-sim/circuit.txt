@@ -1,8 +1,9 @@
 * code to describe a 2x1 MUX 
 
-inp S A B C
+inp S A B
 outp Z
 
-and S A l
-and B C m
-or m l Z
+and A l m
+inv S l
+and S B n
+or m n Z
