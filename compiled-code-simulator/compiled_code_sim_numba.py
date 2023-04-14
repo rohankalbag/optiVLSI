@@ -261,8 +261,17 @@ if __name__ == '__main__':
         for j in range(len(v)):
             truthtable[outputs[j]].append(v[j])
     
-    time_bench = time.perf_counter()
+    
+    truthtable = {}
+
+    for j in range(len(inputs)):
+        truthtable[inputs[j]] = []
+
+    for j in range(len(outputs)):
+        truthtable[outputs[j]] = []
+    
     #actual benchmark
+    time_bench = time.perf_counter()
     for i in testvectors:
         for j in range(len(i)):
             truthtable[inputs[j]].append(i[j])
