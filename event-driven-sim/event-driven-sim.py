@@ -3,7 +3,7 @@ import pandas as pd
 import numba
 import numpy as np
 import warnings
-
+import time
 
 
 def get_input_output_nodes(filename):
@@ -22,35 +22,6 @@ def get_input_output_nodes(filename):
             else:
                 pass
     return (inputs, outputs)
-
-
-@numba.njit
-def find_out(g, in1, in2):
-    out = 0
-    g = ord(g)-48
-    # print(g)
-    in1 = int(in1)
-    in2 = int(in2)
-    if (g == 0):
-        if (in1 == 1):
-            out = 0
-        else:
-            out = 1
-
-    elif (g == 1):
-        # print('here')
-        if (in1 and in2):
-            out = 1
-        else:
-            out = 0
-
-    elif (g == 2):
-        if (in1 or in2):
-            out = 1
-        else:
-            out = 0
-
-    return out
 
 
 def read_file(filename):
@@ -143,7 +114,36 @@ def read_file(filename):
 
 
 @numba.njit
-def simulate(nets_old, inputs, outputs, gates, nets_fanout, testvector):
+def find_out_nb(g, in1, in2):
+    out = 0
+    g = ord(g)-48
+    # print(g)
+    in1 = int(in1)
+    in2 = int(in2)
+    if (g == 0):
+        if (in1 == 1):
+            out = 0
+        else:
+            out = 1
+
+    elif (g == 1):
+        # print('here')
+        if (in1 and in2):
+            out = 1
+        else:
+            out = 0
+
+    elif (g == 2):
+        if (in1 or in2):
+            out = 1
+        else:
+            out = 0
+
+    return out
+
+
+@numba.njit
+def simulate_nb(nets_old, inputs, outputs, gates, nets_fanout, testvector):
 
     nets = nets_old
 
@@ -169,16 +169,16 @@ def simulate(nets_old, inputs, outputs, gates, nets_fanout, testvector):
         # print(gates[int(gate_queue[0])][0])
         # print(nets[gates[int(gate_queue[0])][1]])
         # print(nets[gates[int(gate_queue[0])][2]])
-        temp = find_out(str(gates[int(gate_queue[0])][0]),
-                        nets[str(gates[int(gate_queue[0])][1])],
-                        nets[str(gates[int(gate_queue[0])][2])])
+        temp = find_out_nb(str(gates[int(gate_queue[0])][0]),
+                           nets[str(gates[int(gate_queue[0])][1])],
+                           nets[str(gates[int(gate_queue[0])][2])])
         # print(temp)
         # gate_queue=gate_queue[1:]
         # print(gates[int(gate_queue[0])][3])
         if nets[str(gates[int(gate_queue[0])][3])] != temp:
             nets[str(gates[int(gate_queue[0])][3])] = temp
             # print(list(map(int, [ord(i) for i in nets_fanout.keys()])))
-            # print(ord(str(gates[int(gate_queue[0])][3])) in 
+            # print(ord(str(gates[int(gate_queue[0])][3])) in
             # list(map(int, [ord(i) for i in nets_fanout.keys()])))
             temp2 = ord(str(gates[int(gate_queue[0])][3]))
             if temp2 in list(map(int, [ord(i) for i in nets_fanout.keys()])):
@@ -198,32 +198,134 @@ def simulate(nets_old, inputs, outputs, gates, nets_fanout, testvector):
     return nets, output_testvector
 
 
+def find_out(g, in1, in2):
+    out = 0
+    g = int(g)
+    in1 = int(in1)
+    in2 = int(in2)
+    if (g == 0):
+        if (in1 == 1):
+            out = 0
+        else:
+            out = 1
+
+    elif (g == 1):
+        if (in1 and in2):
+            out = 1
+        else:
+            out = 0
+
+    elif (g == 2):
+        if (in1 or in2):
+            out = 1
+        else:
+            out = 0
+
+    return out
+
+
+def simulate(nets_old, inputs, outputs, gates, nets_fanout, testvector):
+    """simulates the circuit stored at ./filename for an input of testvector
+    and returns output vector"""
+    nets = nets_old
+
+    # assign the testvector to input nets
+    gate_queue = []
+    for i in range(len(testvector)):
+        if (nets[inputs[i]] != testvector[i]):
+            nets[inputs[i]] = testvector[i]
+            for k in nets_fanout[inputs[i]]:
+                if k not in gate_queue:
+                    gate_queue = np.append(gate_queue, k)
+    # print(nets)
+    # print(gate_queue)
+
+    while (len(gate_queue) > 0):
+        # print(nets)
+        # print(gate_queue)
+        # print(gates[int(gate_queue[0])][0])
+        # print(nets[gates[int(gate_queue[0])][1]])
+        # print(nets[gates[int(gate_queue[0])][2]])
+        temp = find_out(gates[int(gate_queue[0])][0],
+                        nets[gates[int(gate_queue[0])][1]],
+                        nets[gates[int(gate_queue[0])][2]])
+        # print(temp)
+        # gate_queue=gate_queue[1:]
+        # print(gates[int(gate_queue[0])][3])
+        if nets[gates[int(gate_queue[0])][3]] != temp:
+            nets[gates[int(gate_queue[0])][3]] = temp
+            if gates[int(gate_queue[0])][3] in nets_fanout.keys():
+                for k in nets_fanout[gates[int(gate_queue[0])][3]]:
+                    if k not in gate_queue:
+                        gate_queue = np.append(gate_queue, k)
+
+        gate_queue = gate_queue[1:]
+
+    output_testvector = []
+
+    for i in outputs:
+        # perform a hash lookup for the output nodes to get the output
+        # corresponding to that net
+        output_testvector.append(nets[i])
+
+    # return the output vector
+    return nets, output_testvector
+
+
 if __name__ == '__main__':
     warnings.filterwarnings("ignore")
     inputs, outputs = get_input_output_nodes('circuit.txt')
 
     # make a dict to store truth table
-    truthtable = {}
+    truthtable_py = {}
+    truthtable_nb = {}
 
     for j in range(len(inputs)):
-        truthtable[inputs[j]] = []
+        truthtable_py[inputs[j]] = []
+        truthtable_nb[inputs[j]] = []
 
     for j in range(len(outputs)):
-        truthtable[outputs[j]] = []
+        truthtable_py[outputs[j]] = []
+        truthtable_nb[outputs[j]] = []
 
     testvectors = list(product((0, 1), repeat=len(inputs)))
     inputs, outputs, nets, gates, nets_fanout = read_file('circuit.txt')
     nets_old = nets
+
+    # Dummy Numba call
+    nets_old_temp, v_temp = simulate_nb(nets_old, inputs, outputs, gates,
+                                        nets_fanout, testvectors[0])
+
+    s = time.perf_counter()
     for i in testvectors:
         for j in range(len(i)):
-            truthtable[inputs[j]].append(i[j])
+            truthtable_nb[inputs[j]].append(i[j])
+        # simulate the ith truthtable entry
+        nets_old, v = simulate_nb(nets_old, inputs, outputs, gates,
+                                  nets_fanout, i)
+
+        for j in range(len(v)):
+            truthtable_nb[outputs[j]].append(v[j])
+    t_nb = time.perf_counter()-s
+    print('Numba:', t_nb)
+
+    s = time.perf_counter()
+    for i in testvectors:
+        for j in range(len(i)):
+            truthtable_py[inputs[j]].append(i[j])
         # simulate the ith truthtable entry
         nets_old, v = simulate(nets_old, inputs, outputs, gates,
                                nets_fanout, i)
 
         for j in range(len(v)):
-            truthtable[outputs[j]].append(v[j])
+            truthtable_py[outputs[j]].append(v[j])
+    t_py = time.perf_counter()-s
+    print('Pythonic:', t_py)
+
+    print('Speedup:', t_py/t_nb)
 
     # use pandas to convert to csv and store
-    truthtable = pd.DataFrame(truthtable)
-    truthtable.to_csv("truthtable.csv", index=False)
+    truthtable = pd.DataFrame(truthtable_nb)
+    truthtable.to_csv("truthtable_numba.csv", index=False)
+    truthtable = pd.DataFrame(truthtable_py)
+    truthtable.to_csv("truthtable_pythonic.csv", index=False)
