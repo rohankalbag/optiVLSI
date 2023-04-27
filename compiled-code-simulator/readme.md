@@ -68,6 +68,7 @@ xor x5 x6 03
 ```bash
 python3 ccsim_algorithm.py --b (optional) -c circuitfile -t truthtablefile
 ```
+
 - `-t/--truthtable` is the filename to store the truth table of the logic simulated, it will be stored in `truthtablefile.csv`
 - `-c/--circuit` is the input filename with description of digital circuit, it should be stored in `circuitfile.txt`
 
