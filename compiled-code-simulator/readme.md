@@ -83,7 +83,7 @@ python3 benchmark_create.py -n powerof2 -c circuit
 
 ## Some Examples
 
-`python3 benchmark_create.py -n 8 -c benchmarks/and8
+`python3 benchmark_create.py -n 8 -c benchmarks/and8`
 
 ### Outputs Obtained 
 
