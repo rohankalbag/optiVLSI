@@ -1,0 +1,21 @@
+inp s0 s1 i0 i1 i2 i3
+outp x
+
+inv s0 s0'
+inv s1 s1'
+
+and s0' s1' x1
+and x1 i0 x2
+
+and s0' s1 x3
+and x3 i1 x4
+
+and s0 s1' x5
+and x5 i2 x6
+
+and s0 s1 x7
+and x7 i3 x8
+
+or x2 x4 o1
+or o1 x6 o2
+or o2 x8 x
