@@ -2,12 +2,15 @@ from automan.api import Problem, Simulation, Automator, mdict, opts2path
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+import pandas as pd
 
-time1 = []
-time2 = []
+names = {}
 
-files = [i[:-4] for i in os.listdir('benchmarks')]
-sizes = [int(j[3:]) for j in [i[:-4] for i in os.listdir('benchmarks')]]
+files = ['benchmarks/' + i[:-4] for i in os.listdir('benchmarks')]
+
+def modify_path(s):
+    k = s.index("benchmarks")
+    return (s[:k] + s[k+11:])
 
 class CCSimulator(Problem):
     def get_name(self):
@@ -30,12 +33,16 @@ class CCSimulator(Problem):
         self.store_data()
     
     def store_data(self):
-        global time1
+        global names
 
         for case in self.cases:
-            with open(case.input_path('stdout.txt')) as file:
+            l = modify_path(case.input_path('stdout.txt'))
+            key = l.split('/')[2]
+            if key not in names.keys():
+                names[key] = [-1, -1]
+            with open(l) as file:
                 m = file.readlines()
-                time1.append(float(m[0]))
+                names[key][0] = float(m[0])
         
 
 class CCSimulatorNumba(Problem):
@@ -59,28 +66,35 @@ class CCSimulatorNumba(Problem):
         self.store_data()
     
     def store_data(self):
-        global time2
+        global names
 
         for case in self.cases:
-            with open(case.input_path('stdout.txt')) as file:
+            l = modify_path(case.input_path('stdout.txt'))
+            key = l.split('/')[2]
+            if key not in names.keys():
+                names[key] = [-1, -1]
+            with open(l) as file:
                 m = file.readlines()
-                time2.append(float(m[0]))
+                names[key][1] = float(m[0])
         
 
 def plot():
-    global time1, time2
+    global names
     plt.figure()
-    
-    time1.sort()
-    time2.sort()
 
-    time1 = np.array(time1)
-    time2 = np.array(time2)
+    time1 = []
+    time2 = []
+    labels = []
 
-    plt.semilogy(sizes, time1, '-s', label='pythonic-compiled-code-sim')
-    plt.semilogy(sizes, time2, '-s', label='numba-compiled-code-sim')
-    plt.grid()
-    plt.xlabel('cascaded and network inputs')
+    for i in names.keys():
+        labels.append(i)
+        time1.append(names[i][0])
+        time2.append(names[i][1])
+
+    plt.semilogy(labels, time1, label="regular-pythonic", marker='o')
+    plt.semilogy(labels, time2, label="numba-accelerated", marker='s')
+
+    plt.xlabel('circuit network benchmarks used')
     plt.ylabel('time taken')
     plt.legend()
     plt.savefig('manuscript/figures/timing.pdf')

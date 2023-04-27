@@ -1,0 +1,14 @@
+inp x0 x1 y0 y1 cin
+outp s0 s1 cout
+
+xor x0 y0 1
+xor 1 cin s0
+and 1 cin 2
+and x0 y0 3
+or 2 3 c1
+
+xor x1 y1 11
+xor 11 c1 s1
+and 11 c1 21
+and x1 y1 31
+or 21 31 cout
