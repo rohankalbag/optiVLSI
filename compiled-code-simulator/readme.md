@@ -71,8 +71,34 @@ python3 ccsim_algorithm.py --b (optional) -c circuitfile -t truthtablefile
 - `-t/--truthtable` is the filename to store the truth table of the logic simulated, it will be stored in `truthtablefile.csv`
 - `-c/--circuit` is the input filename with description of digital circuit, it should be stored in `circuitfile.txt`
 
+## Usage of `benchmark_create.py`
+
+```bash
+python3 benchmark_create.py -n powerof2 -c circuit
+``` 
+
+- `-n/--pow2` is the number of inputs to the generic n-input and gate implemented by cascading 2 input and gates in a tree like structure
+- `-c/--circuit` is the description of the circuit saved in `circuit.txt`
 
 ## Some Examples
+
+`python3 benchmark_create.py -n 8 -c benchmarks/and8
+
+### Outputs Obtained 
+
+#### `benchmarks/and8.txt`
+
+```
+inp 0 1 2 3 4 5 6 7
+outp 14
+and 0 1 8
+and 2 3 9
+and 4 5 10
+and 6 7 11
+and 8 9 12
+and 10 11 13
+and 12 13 14
+```
 
 `python3 compiled_code_sim.py -c benchmarks/fulladder  -t fulladder --b`
 
@@ -83,7 +109,7 @@ python3 ccsim_algorithm.py --b (optional) -c circuitfile -t truthtablefile
 7.574600203952286e-05
 ```
 
-### `fulladder.csv`
+#### `fulladder.csv`
 
 
 ```
@@ -108,3 +134,5 @@ A,B,C,Sum,Cout
 ### Results Obtained on Benchmarking
 
 - The numba accelerated implementation is atleast an order of magnitude $10^1$ faster than the regular pythonic implementation of the logic simulator as we can see for various common circuit benchmarks in `benchmarks/` 
+
+![image](https://user-images.githubusercontent.com/46604893/234865017-2574f715-2618-4c55-bac2-50307c7d0a17.png)
