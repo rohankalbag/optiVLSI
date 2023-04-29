@@ -1,0 +1,17 @@
+inp A B C D E F G H I J K L M N O P
+outp _
+and A B Q
+and C D R
+and E F S
+and G H T
+and I J U
+and K L V
+and M N W
+and O P X
+and Q R Y
+and S T Z
+and U V [
+and W X \
+and Y Z ]
+and [ \ ^
+and ] ^ _

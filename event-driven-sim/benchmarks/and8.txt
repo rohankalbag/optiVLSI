@@ -1,0 +1,9 @@
+inp A B C D E F G H
+outp O
+and A B I
+and C D J
+and E F K
+and G H L
+and I J M
+and K L N
+and M N O

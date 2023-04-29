@@ -1,0 +1,5 @@
+inp A B C D
+outp G
+and A B E
+and C D F
+and E F G

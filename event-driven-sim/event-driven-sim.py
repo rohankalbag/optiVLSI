@@ -4,6 +4,17 @@ import numba
 import numpy as np
 import warnings
 import time
+from argparse import ArgumentParser
+
+
+def command_line_fetcher():
+    # function to fetch command line arguments
+    parser = ArgumentParser(description="ccsim")
+    parser.add_argument(
+        '-c', '--circuit', help="circuit filename")
+    parser.add_argument("-t", '--truthtable', help="save final truthtable")
+    parser.add_argument('--b', action='store_true', help='print benchmark results')
+    return parser.parse_args()
 
 
 def get_input_output_nodes(filename):
@@ -273,8 +284,13 @@ def simulate(nets_old, inputs, outputs, gates, nets_fanout, testvector):
 
 
 if __name__ == '__main__':
+    args = command_line_fetcher()
+    circuitfile = args.circuit
+    truthtablefile = args.truthtable
+    bench = args.b
+
     warnings.filterwarnings("ignore")
-    inputs, outputs = get_input_output_nodes('circuit.txt')
+    inputs, outputs = get_input_output_nodes(f'{circuitfile}')
 
     # make a dict to store truth table
     truthtable_py = {}
@@ -289,7 +305,7 @@ if __name__ == '__main__':
         truthtable_nb[outputs[j]] = []
 
     testvectors = list(product((0, 1), repeat=len(inputs)))
-    inputs, outputs, nets, gates, nets_fanout = read_file('circuit.txt')
+    inputs, outputs, nets, gates, nets_fanout = read_file(f'{circuitfile}')
     nets_old = nets
 
     # Dummy Numba call
@@ -307,7 +323,6 @@ if __name__ == '__main__':
         for j in range(len(v)):
             truthtable_nb[outputs[j]].append(v[j])
     t_nb = time.perf_counter()-s
-    print('Numba:', t_nb)
 
     s = time.perf_counter()
     for i in testvectors:
@@ -320,12 +335,11 @@ if __name__ == '__main__':
         for j in range(len(v)):
             truthtable_py[outputs[j]].append(v[j])
     t_py = time.perf_counter()-s
-    print('Pythonic:', t_py)
 
-    print('Speedup:', t_py/t_nb)
+    if (bench):
+        print(t_py)
+        print(t_nb)
 
     # use pandas to convert to csv and store
     truthtable = pd.DataFrame(truthtable_nb)
-    truthtable.to_csv("truthtable_numba.csv", index=False)
-    truthtable = pd.DataFrame(truthtable_py)
-    truthtable.to_csv("truthtable_pythonic.csv", index=False)
+    truthtable.to_csv(f"{truthtablefile}.csv", index=False)

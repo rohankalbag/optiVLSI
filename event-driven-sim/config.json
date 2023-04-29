@@ -1,0 +1,14 @@
+{
+  "project_name": "event-driven-sim",
+  "root": "automan",
+  "sources": [
+    "/home/neeraj/Documents/AE6102/Project/optiVLSI/event-driven-sim"
+  ],
+  "workers": [
+    {
+      "host": "localhost",
+      "home": "",
+      "nfs": false
+    }
+  ]
+}
