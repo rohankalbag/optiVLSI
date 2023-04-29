@@ -149,8 +149,9 @@ def main():
 
 
 if __name__ == "__main__":
-    inp = "a.b.c.d.e.f"
-    order = "abcdef"
+    a = command_line_fetcher()
+    inp = a.input
+    order = a.order
     inp1 = []
     ord1 = []
     for i in range(len(inp)):
