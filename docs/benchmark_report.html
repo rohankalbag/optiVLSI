@@ -8,25 +8,29 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0d1117; color: #c9d1d9; padding: 2rem; }
         h1 { color: #58a6ff; margin-bottom: 0.5rem; }
-        h2 { color: #f0f6fc; margin: 2rem 0 1rem; border-bottom: 1px solid #30363d; padding-bottom: 0.5rem; }
+        h2 { color: #f0f6fc; margin: 2rem 0 0.5rem; }
+        .algo-section { margin-bottom: 2.5rem; border: 1px solid #30363d; border-radius: 8px; overflow: hidden; }
+        .algo-header { background: #1c2128; padding: 1rem 1.5rem; border-bottom: 1px solid #30363d; }
+        .algo-header h2 { margin: 0; }
+        .size-table { border-bottom: 1px solid #21262d; }
+        .size-table:last-child { border-bottom: none; }
+        .size-title { padding: 0.75rem 1.5rem; background: #161b22; color: #8b949e; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; }
         .meta { color: #8b949e; font-size: 0.9rem; margin-bottom: 2rem; }
         .meta span { margin-right: 1.5rem; }
-        table { border-collapse: collapse; width: 100%; margin-bottom: 1.5rem; background: #161b22; border-radius: 6px; overflow: hidden; }
-        th, td { padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid #30363d; }
-        th { background: #1c2128; color: #8b949e; font-weight: 600; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.05em; }
-        td { font-size: 0.875rem; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { padding: 0.65rem 1rem; text-align: left; border-bottom: 1px solid #21262d; }
+        th { background: #0d1117; color: #8b949e; font-weight: 600; text-transform: uppercase; font-size: 0.72rem; letter-spacing: 0.05em; }
+        td { font-size: 0.85rem; }
         tr:last-child td { border-bottom: none; }
         tr:hover td { background: #1c2128; }
-        .fastest { color: #3fb950; font-weight: 600; }
-        .slowest { color: #f85149; }
         .bar-container { display: flex; align-items: center; gap: 0.5rem; }
-        .bar { height: 20px; border-radius: 4px; min-width: 4px; transition: width 0.3s; }
-        .bar.fastest { background: #3fb950; }
-        .bar.mid { background: #d29922; }
-        .bar.slowest { background: #f85149; }
-        .value { min-width: 80px; text-align: right; }
+        .bar { height: 18px; border-radius: 3px; min-width: 4px; transition: width 0.3s; }
+        .bar.green { background: #3fb950; }
+        .bar.yellow { background: #d29922; }
+        .bar.red { background: #f85149; }
+        .value { min-width: 72px; text-align: right; font-variant-numeric: tabular-nums; }
         .footer { margin-top: 2rem; color: #8b949e; font-size: 0.8rem; text-align: center; border-top: 1px solid #30363d; padding-top: 1rem; }
-        .summary-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
+        .summary-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
         .card { background: #161b22; border-radius: 6px; padding: 1.25rem; border: 1px solid #30363d; }
         .card h3 { color: #8b949e; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; }
         .card .number { color: #f0f6fc; font-size: 1.5rem; font-weight: 600; margin-top: 0.25rem; }
@@ -37,13 +41,13 @@
     <div class="meta">
         <span>🖥️ N/A</span>
         <span>🐍 Python 3.12.3</span>
-        <span>⏱️ 15 benchmarks</span>
+        <span>⏱️ 45 benchmarks</span>
     </div>
 
     <div class="summary-cards">
         <div class="card">
             <h3>Total Benchmarks</h3>
-            <div class="number">15</div>
+            <div class="number">45</div>
         </div>
         <div class="card">
             <h3>Algorithms Tested</h3>
@@ -51,297 +55,1031 @@
         </div>
         <div class="card">
             <h3>Fastest Mean</h3>
-            <div class="number">25.9μs</div>
+            <div class="number">85.3μs</div>
         </div>
     </div>
-<h2>Bellman Ford</h2>
-<table>
-            <thead>
-                <tr>
-                    <th>Variant</th>
-                    <th>Mean (μs)</th>
-                    <th>Min (μs)</th>
-                    <th>Max (μs)</th>
-                    <th>Median (μs)</th>
-                    <th>Rounds</th>
-                    <th>Comparison</th>
-                </tr>
-            </thead>
-            <tbody>
-<tr>
-                <td><strong>NetworkX</strong></td>
-                <td class="value">31.57</td>
-                <td class="value">29.29</td>
-                <td class="value">577.79</td>
-                <td class="value">29.79</td>
-                <td class="value">1859</td>
+<div class="algo-section">
+  <div class="algo-header"><h2>Bellman Ford</h2></div>
+  <div class="size-table">
+    <div class="size-title">size = 50</div>
+    <table>
+        <thead>
+            <tr>
+                <th>Variant</th>
+                <th>Mean (μs)</th>
+                <th>Min (μs)</th>
+                <th>Max (μs)</th>
+                <th>Median (μs)</th>
+                <th>Rounds</th>
+                <th>vs Fastest</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Numba</strong></td>
+                <td class="value">85.28</td>
+                <td class="value">69.75</td>
+                <td class="value">131.83</td>
+                <td class="value">72.79</td>
+                <td class="value">5</td>
                 <td>
                     <div class="bar-container">
-                        <div class="bar fastest" style="width: 73.8%"></div>
+                        <div class="bar green" style="width: 5.0%"></div>
                         <span>× 1.0</span>
                     </div>
                 </td>
             </tr>
-<tr>
+            <tr>
+                <td><strong>NetworkX</strong></td>
+                <td class="value">1053.99</td>
+                <td class="value">1036.33</td>
+                <td class="value">1155.46</td>
+                <td class="value">1049.54</td>
+                <td class="value">453</td>
+                <td>
+                    <div class="bar-container">
+                        <div class="bar yellow" style="width: 5.0%"></div>
+                        <span>× 12.4</span>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td><strong>Pythonic</strong></td>
+                <td class="value">42670.56</td>
+                <td class="value">42155.79</td>
+                <td class="value">43868.54</td>
+                <td class="value">42659.52</td>
+                <td class="value">24</td>
+                <td>
+                    <div class="bar-container">
+                        <div class="bar red" style="width: 100.0%"></div>
+                        <span>× 500.3</span>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+  </div>
+  <div class="size-table">
+    <div class="size-title">size = 100</div>
+    <table>
+        <thead>
+            <tr>
+                <th>Variant</th>
+                <th>Mean (μs)</th>
+                <th>Min (μs)</th>
+                <th>Max (μs)</th>
+                <th>Median (μs)</th>
+                <th>Rounds</th>
+                <th>vs Fastest</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
                 <td><strong>Numba</strong></td>
-                <td class="value">38.20</td>
-                <td class="value">20.21</td>
-                <td class="value">92.58</td>
-                <td class="value">24.71</td>
-                <td class="value">5</td>
+                <td class="value">439.14</td>
+                <td class="value">422.75</td>
+                <td class="value">579.17</td>
+                <td class="value">435.00</td>
+                <td class="value">2089</td>
                 <td>
                     <div class="bar-container">
-                        <div class="bar mid" style="width: 89.3%"></div>
-                        <span>× 1.2</span>
-                    </div>
-                </td>
-            </tr>
-<tr>
-                <td><strong>Pythonic</strong></td>
-                <td class="value">42.79</td>
-                <td class="value">40.58</td>
-                <td class="value">2100.96</td>
-                <td class="value">41.29</td>
-                <td class="value">8566</td>
-                <td>
-                    <div class="bar-container">
-                        <div class="bar slowest" style="width: 100.0%"></div>
-                        <span>× 1.4</span>
-                    </div>
-                </td>
-            </tr>
-</tbody></table>
-<h2>Dijkstra</h2>
-<table>
-            <thead>
-                <tr>
-                    <th>Variant</th>
-                    <th>Mean (μs)</th>
-                    <th>Min (μs)</th>
-                    <th>Max (μs)</th>
-                    <th>Median (μs)</th>
-                    <th>Rounds</th>
-                    <th>Comparison</th>
-                </tr>
-            </thead>
-            <tbody>
-<tr>
-                <td><strong>Pythonic</strong></td>
-                <td class="value">25.92</td>
-                <td class="value">23.58</td>
-                <td class="value">569.29</td>
-                <td class="value">24.17</td>
-                <td class="value">15057</td>
-                <td>
-                    <div class="bar-container">
-                        <div class="bar fastest" style="width: 12.1%"></div>
+                        <div class="bar green" style="width: 5.0%"></div>
                         <span>× 1.0</span>
                     </div>
                 </td>
             </tr>
-<tr>
+            <tr>
                 <td><strong>NetworkX</strong></td>
-                <td class="value">37.36</td>
-                <td class="value">35.46</td>
-                <td class="value">177.83</td>
-                <td class="value">36.12</td>
-                <td class="value">1884</td>
+                <td class="value">4003.70</td>
+                <td class="value">3932.54</td>
+                <td class="value">4216.71</td>
+                <td class="value">4002.88</td>
+                <td class="value">237</td>
                 <td>
                     <div class="bar-container">
-                        <div class="bar mid" style="width: 17.5%"></div>
-                        <span>× 1.4</span>
+                        <div class="bar yellow" style="width: 5.0%"></div>
+                        <span>× 9.1</span>
                     </div>
                 </td>
             </tr>
-<tr>
-                <td><strong>Numba</strong></td>
-                <td class="value">214.06</td>
-                <td class="value">132.29</td>
-                <td class="value">479.96</td>
-                <td class="value">139.17</td>
+            <tr>
+                <td><strong>Pythonic</strong></td>
+                <td class="value">374368.03</td>
+                <td class="value">372894.04</td>
+                <td class="value">376042.50</td>
+                <td class="value">374348.46</td>
                 <td class="value">5</td>
                 <td>
                     <div class="bar-container">
-                        <div class="bar slowest" style="width: 100.0%"></div>
-                        <span>× 8.3</span>
+                        <div class="bar red" style="width: 100.0%"></div>
+                        <span>× 852.5</span>
                     </div>
                 </td>
             </tr>
-</tbody></table>
-<h2>Kruskal</h2>
-<table>
-            <thead>
-                <tr>
-                    <th>Variant</th>
-                    <th>Mean (μs)</th>
-                    <th>Min (μs)</th>
-                    <th>Max (μs)</th>
-                    <th>Median (μs)</th>
-                    <th>Rounds</th>
-                    <th>Comparison</th>
-                </tr>
-            </thead>
-            <tbody>
-<tr>
-                <td><strong>Pythonic</strong></td>
-                <td class="value">27.59</td>
-                <td class="value">20.79</td>
-                <td class="value">337.75</td>
-                <td class="value">25.87</td>
-                <td class="value">1205</td>
+        </tbody>
+    </table>
+  </div>
+  <div class="size-table">
+    <div class="size-title">size = 200</div>
+    <table>
+        <thead>
+            <tr>
+                <th>Variant</th>
+                <th>Mean (μs)</th>
+                <th>Min (μs)</th>
+                <th>Max (μs)</th>
+                <th>Median (μs)</th>
+                <th>Rounds</th>
+                <th>vs Fastest</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Numba</strong></td>
+                <td class="value">3377.24</td>
+                <td class="value">3310.75</td>
+                <td class="value">3522.71</td>
+                <td class="value">3367.52</td>
+                <td class="value">290</td>
                 <td>
                     <div class="bar-container">
-                        <div class="bar fastest" style="width: 37.6%"></div>
+                        <div class="bar green" style="width: 5.0%"></div>
                         <span>× 1.0</span>
                     </div>
                 </td>
             </tr>
-<tr>
+            <tr>
                 <td><strong>NetworkX</strong></td>
-                <td class="value">63.59</td>
-                <td class="value">48.08</td>
-                <td class="value">778.71</td>
-                <td class="value">57.17</td>
-                <td class="value">409</td>
+                <td class="value">16071.25</td>
+                <td class="value">15090.12</td>
+                <td class="value">62723.37</td>
+                <td class="value">15313.02</td>
+                <td class="value">64</td>
                 <td>
                     <div class="bar-container">
-                        <div class="bar mid" style="width: 86.7%"></div>
-                        <span>× 2.3</span>
+                        <div class="bar yellow" style="width: 5.0%"></div>
+                        <span>× 4.8</span>
                     </div>
                 </td>
             </tr>
-<tr>
-                <td><strong>Numba</strong></td>
-                <td class="value">73.37</td>
-                <td class="value">49.37</td>
-                <td class="value">145.88</td>
-                <td class="value">53.58</td>
+            <tr>
+                <td><strong>Pythonic</strong></td>
+                <td class="value">2982164.21</td>
+                <td class="value">2932957.75</td>
+                <td class="value">3051618.92</td>
+                <td class="value">2977312.83</td>
                 <td class="value">5</td>
                 <td>
                     <div class="bar-container">
-                        <div class="bar slowest" style="width: 100.0%"></div>
+                        <div class="bar red" style="width: 100.0%"></div>
+                        <span>× 883.0</span>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+  </div>
+</div>
+<div class="algo-section">
+  <div class="algo-header"><h2>Dijkstra</h2></div>
+  <div class="size-table">
+    <div class="size-title">size = 50</div>
+    <table>
+        <thead>
+            <tr>
+                <th>Variant</th>
+                <th>Mean (μs)</th>
+                <th>Min (μs)</th>
+                <th>Max (μs)</th>
+                <th>Median (μs)</th>
+                <th>Rounds</th>
+                <th>vs Fastest</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Numba</strong></td>
+                <td class="value">191.51</td>
+                <td class="value">158.83</td>
+                <td class="value">264.08</td>
+                <td class="value">182.58</td>
+                <td class="value">5</td>
+                <td>
+                    <div class="bar-container">
+                        <div class="bar green" style="width: 39.6%"></div>
+                        <span>× 1.0</span>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td><strong>Pythonic</strong></td>
+                <td class="value">317.88</td>
+                <td class="value">312.54</td>
+                <td class="value">386.75</td>
+                <td class="value">315.79</td>
+                <td class="value">2276</td>
+                <td>
+                    <div class="bar-container">
+                        <div class="bar yellow" style="width: 65.7%"></div>
+                        <span>× 1.7</span>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td><strong>NetworkX</strong></td>
+                <td class="value">484.15</td>
+                <td class="value">474.79</td>
+                <td class="value">575.92</td>
+                <td class="value">481.71</td>
+                <td class="value">1058</td>
+                <td>
+                    <div class="bar-container">
+                        <div class="bar red" style="width: 100.0%"></div>
+                        <span>× 2.5</span>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+  </div>
+  <div class="size-table">
+    <div class="size-title">size = 100</div>
+    <table>
+        <thead>
+            <tr>
+                <th>Variant</th>
+                <th>Mean (μs)</th>
+                <th>Min (μs)</th>
+                <th>Max (μs)</th>
+                <th>Median (μs)</th>
+                <th>Rounds</th>
+                <th>vs Fastest</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Numba</strong></td>
+                <td class="value">381.05</td>
+                <td class="value">374.71</td>
+                <td class="value">590.63</td>
+                <td class="value">377.54</td>
+                <td class="value">2216</td>
+                <td>
+                    <div class="bar-container">
+                        <div class="bar green" style="width: 18.2%"></div>
+                        <span>× 1.0</span>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td><strong>Pythonic</strong></td>
+                <td class="value">1310.15</td>
+                <td class="value">1291.25</td>
+                <td class="value">1405.29</td>
+                <td class="value">1304.87</td>
+                <td class="value">547</td>
+                <td>
+                    <div class="bar-container">
+                        <div class="bar yellow" style="width: 62.6%"></div>
+                        <span>× 3.4</span>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td><strong>NetworkX</strong></td>
+                <td class="value">2092.02</td>
+                <td class="value">2052.67</td>
+                <td class="value">2689.83</td>
+                <td class="value">2082.60</td>
+                <td class="value">462</td>
+                <td>
+                    <div class="bar-container">
+                        <div class="bar red" style="width: 100.0%"></div>
+                        <span>× 5.5</span>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+  </div>
+  <div class="size-table">
+    <div class="size-title">size = 175</div>
+    <table>
+        <thead>
+            <tr>
+                <th>Variant</th>
+                <th>Mean (μs)</th>
+                <th>Min (μs)</th>
+                <th>Max (μs)</th>
+                <th>Median (μs)</th>
+                <th>Rounds</th>
+                <th>vs Fastest</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Numba</strong></td>
+                <td class="value">2036.01</td>
+                <td class="value">1998.21</td>
+                <td class="value">2224.58</td>
+                <td class="value">2024.00</td>
+                <td class="value">481</td>
+                <td>
+                    <div class="bar-container">
+                        <div class="bar green" style="width: 30.1%"></div>
+                        <span>× 1.0</span>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td><strong>Pythonic</strong></td>
+                <td class="value">4317.53</td>
+                <td class="value">4247.67</td>
+                <td class="value">4779.46</td>
+                <td class="value">4306.29</td>
+                <td class="value">209</td>
+                <td>
+                    <div class="bar-container">
+                        <div class="bar yellow" style="width: 63.7%"></div>
+                        <span>× 2.1</span>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td><strong>NetworkX</strong></td>
+                <td class="value">6775.14</td>
+                <td class="value">6373.92</td>
+                <td class="value">45486.83</td>
+                <td class="value">6508.17</td>
+                <td class="value">148</td>
+                <td>
+                    <div class="bar-container">
+                        <div class="bar red" style="width: 100.0%"></div>
+                        <span>× 3.3</span>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+  </div>
+</div>
+<div class="algo-section">
+  <div class="algo-header"><h2>Kruskal</h2></div>
+  <div class="size-table">
+    <div class="size-title">size = 50</div>
+    <table>
+        <thead>
+            <tr>
+                <th>Variant</th>
+                <th>Mean (μs)</th>
+                <th>Min (μs)</th>
+                <th>Max (μs)</th>
+                <th>Median (μs)</th>
+                <th>Rounds</th>
+                <th>vs Fastest</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Numba</strong></td>
+                <td class="value">159.95</td>
+                <td class="value">135.96</td>
+                <td class="value">215.42</td>
+                <td class="value">145.58</td>
+                <td class="value">5</td>
+                <td>
+                    <div class="bar-container">
+                        <div class="bar green" style="width: 14.0%"></div>
+                        <span>× 1.0</span>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td><strong>Pythonic</strong></td>
+                <td class="value">793.64</td>
+                <td class="value">778.29</td>
+                <td class="value">972.88</td>
+                <td class="value">787.33</td>
+                <td class="value">1076</td>
+                <td>
+                    <div class="bar-container">
+                        <div class="bar yellow" style="width: 69.7%"></div>
+                        <span>× 5.0</span>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td><strong>NetworkX</strong></td>
+                <td class="value">1138.90</td>
+                <td class="value">1060.33</td>
+                <td class="value">1802.50</td>
+                <td class="value">1099.73</td>
+                <td class="value">590</td>
+                <td>
+                    <div class="bar-container">
+                        <div class="bar red" style="width: 100.0%"></div>
+                        <span>× 7.1</span>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+  </div>
+  <div class="size-table">
+    <div class="size-title">size = 100</div>
+    <table>
+        <thead>
+            <tr>
+                <th>Variant</th>
+                <th>Mean (μs)</th>
+                <th>Min (μs)</th>
+                <th>Max (μs)</th>
+                <th>Median (μs)</th>
+                <th>Rounds</th>
+                <th>vs Fastest</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Numba</strong></td>
+                <td class="value">244.14</td>
+                <td class="value">238.62</td>
+                <td class="value">386.79</td>
+                <td class="value">242.08</td>
+                <td class="value">2910</td>
+                <td>
+                    <div class="bar-container">
+                        <div class="bar green" style="width: 5.9%"></div>
+                        <span>× 1.0</span>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td><strong>Pythonic</strong></td>
+                <td class="value">3048.78</td>
+                <td class="value">3002.38</td>
+                <td class="value">3191.63</td>
+                <td class="value">3041.81</td>
+                <td class="value">322</td>
+                <td>
+                    <div class="bar-container">
+                        <div class="bar yellow" style="width: 74.1%"></div>
+                        <span>× 12.5</span>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td><strong>NetworkX</strong></td>
+                <td class="value">4116.48</td>
+                <td class="value">3874.00</td>
+                <td class="value">4898.79</td>
+                <td class="value">3994.77</td>
+                <td class="value">244</td>
+                <td>
+                    <div class="bar-container">
+                        <div class="bar red" style="width: 100.0%"></div>
+                        <span>× 16.9</span>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+  </div>
+  <div class="size-table">
+    <div class="size-title">size = 200</div>
+    <table>
+        <thead>
+            <tr>
+                <th>Variant</th>
+                <th>Mean (μs)</th>
+                <th>Min (μs)</th>
+                <th>Max (μs)</th>
+                <th>Median (μs)</th>
+                <th>Rounds</th>
+                <th>vs Fastest</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Numba</strong></td>
+                <td class="value">690.07</td>
+                <td class="value">676.17</td>
+                <td class="value">806.04</td>
+                <td class="value">686.67</td>
+                <td class="value">1131</td>
+                <td>
+                    <div class="bar-container">
+                        <div class="bar green" style="width: 5.0%"></div>
+                        <span>× 1.0</span>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td><strong>Pythonic</strong></td>
+                <td class="value">12245.02</td>
+                <td class="value">12102.08</td>
+                <td class="value">12507.71</td>
+                <td class="value">12238.54</td>
+                <td class="value">82</td>
+                <td>
+                    <div class="bar-container">
+                        <div class="bar yellow" style="width: 64.8%"></div>
+                        <span>× 17.7</span>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td><strong>NetworkX</strong></td>
+                <td class="value">18889.70</td>
+                <td class="value">15712.17</td>
+                <td class="value">80990.42</td>
+                <td class="value">15950.17</td>
+                <td class="value">62</td>
+                <td>
+                    <div class="bar-container">
+                        <div class="bar red" style="width: 100.0%"></div>
+                        <span>× 27.4</span>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+  </div>
+</div>
+<div class="algo-section">
+  <div class="algo-header"><h2>Lee</h2></div>
+  <div class="size-table">
+    <div class="size-title">size = 50</div>
+    <table>
+        <thead>
+            <tr>
+                <th>Variant</th>
+                <th>Mean (μs)</th>
+                <th>Min (μs)</th>
+                <th>Max (μs)</th>
+                <th>Median (μs)</th>
+                <th>Rounds</th>
+                <th>vs Fastest</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Numba</strong></td>
+                <td class="value">125.06</td>
+                <td class="value">111.38</td>
+                <td class="value">162.42</td>
+                <td class="value">117.54</td>
+                <td class="value">5</td>
+                <td>
+                    <div class="bar-container">
+                        <div class="bar green" style="width: 5.0%"></div>
+                        <span>× 1.0</span>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td><strong>Pythonic</strong></td>
+                <td class="value">1052.73</td>
+                <td class="value">1034.04</td>
+                <td class="value">1507.08</td>
+                <td class="value">1040.13</td>
+                <td class="value">933</td>
+                <td>
+                    <div class="bar-container">
+                        <div class="bar yellow" style="width: 14.4%"></div>
+                        <span>× 8.4</span>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td><strong>NetworkX</strong></td>
+                <td class="value">7287.07</td>
+                <td class="value">6720.00</td>
+                <td class="value">20587.79</td>
+                <td class="value">6872.83</td>
+                <td class="value">138</td>
+                <td>
+                    <div class="bar-container">
+                        <div class="bar red" style="width: 100.0%"></div>
+                        <span>× 58.3</span>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+  </div>
+  <div class="size-table">
+    <div class="size-title">size = 100</div>
+    <table>
+        <thead>
+            <tr>
+                <th>Variant</th>
+                <th>Mean (μs)</th>
+                <th>Min (μs)</th>
+                <th>Max (μs)</th>
+                <th>Median (μs)</th>
+                <th>Rounds</th>
+                <th>vs Fastest</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Numba</strong></td>
+                <td class="value">337.42</td>
+                <td class="value">333.46</td>
+                <td class="value">391.00</td>
+                <td class="value">334.88</td>
+                <td class="value">2800</td>
+                <td>
+                    <div class="bar-container">
+                        <div class="bar green" style="width: 5.0%"></div>
+                        <span>× 1.0</span>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td><strong>Pythonic</strong></td>
+                <td class="value">4217.86</td>
+                <td class="value">4139.62</td>
+                <td class="value">4745.38</td>
+                <td class="value">4190.38</td>
+                <td class="value">231</td>
+                <td>
+                    <div class="bar-container">
+                        <div class="bar yellow" style="width: 14.2%"></div>
+                        <span>× 12.5</span>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td><strong>NetworkX</strong></td>
+                <td class="value">29788.88</td>
+                <td class="value">27996.04</td>
+                <td class="value">71790.50</td>
+                <td class="value">28407.25</td>
+                <td class="value">33</td>
+                <td>
+                    <div class="bar-container">
+                        <div class="bar red" style="width: 100.0%"></div>
+                        <span>× 88.3</span>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+  </div>
+  <div class="size-table">
+    <div class="size-title">size = 200</div>
+    <table>
+        <thead>
+            <tr>
+                <th>Variant</th>
+                <th>Mean (μs)</th>
+                <th>Min (μs)</th>
+                <th>Max (μs)</th>
+                <th>Median (μs)</th>
+                <th>Rounds</th>
+                <th>vs Fastest</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Numba</strong></td>
+                <td class="value">1322.38</td>
+                <td class="value">1310.54</td>
+                <td class="value">1413.67</td>
+                <td class="value">1315.81</td>
+                <td class="value">736</td>
+                <td>
+                    <div class="bar-container">
+                        <div class="bar green" style="width: 5.0%"></div>
+                        <span>× 1.0</span>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td><strong>Pythonic</strong></td>
+                <td class="value">17091.31</td>
+                <td class="value">16928.00</td>
+                <td class="value">17944.21</td>
+                <td class="value">17035.29</td>
+                <td class="value">58</td>
+                <td>
+                    <div class="bar-container">
+                        <div class="bar yellow" style="width: 13.4%"></div>
+                        <span>× 12.9</span>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td><strong>NetworkX</strong></td>
+                <td class="value">127952.28</td>
+                <td class="value">117077.42</td>
+                <td class="value">163306.29</td>
+                <td class="value">118122.50</td>
+                <td class="value">9</td>
+                <td>
+                    <div class="bar-container">
+                        <div class="bar red" style="width: 100.0%"></div>
+                        <span>× 96.8</span>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+  </div>
+</div>
+<div class="algo-section">
+  <div class="algo-header"><h2>Prim</h2></div>
+  <div class="size-table">
+    <div class="size-title">size = 50</div>
+    <table>
+        <thead>
+            <tr>
+                <th>Variant</th>
+                <th>Mean (μs)</th>
+                <th>Min (μs)</th>
+                <th>Max (μs)</th>
+                <th>Median (μs)</th>
+                <th>Rounds</th>
+                <th>vs Fastest</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Numba</strong></td>
+                <td class="value">330.98</td>
+                <td class="value">311.71</td>
+                <td class="value">388.04</td>
+                <td class="value">314.46</td>
+                <td class="value">5</td>
+                <td>
+                    <div class="bar-container">
+                        <div class="bar green" style="width: 34.7%"></div>
+                        <span>× 1.0</span>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td><strong>Pythonic</strong></td>
+                <td class="value">897.67</td>
+                <td class="value">801.29</td>
+                <td class="value">9824.50</td>
+                <td class="value">806.71</td>
+                <td class="value">477</td>
+                <td>
+                    <div class="bar-container">
+                        <div class="bar yellow" style="width: 94.0%"></div>
                         <span>× 2.7</span>
                     </div>
                 </td>
             </tr>
-</tbody></table>
-<h2>Lee</h2>
-<table>
-            <thead>
-                <tr>
-                    <th>Variant</th>
-                    <th>Mean (μs)</th>
-                    <th>Min (μs)</th>
-                    <th>Max (μs)</th>
-                    <th>Median (μs)</th>
-                    <th>Rounds</th>
-                    <th>Comparison</th>
-                </tr>
-            </thead>
-            <tbody>
-<tr>
-                <td><strong>Numba</strong></td>
-                <td class="value">77.23</td>
-                <td class="value">63.67</td>
-                <td class="value">121.67</td>
-                <td class="value">66.13</td>
-                <td class="value">5</td>
+            <tr>
+                <td><strong>NetworkX</strong></td>
+                <td class="value">955.02</td>
+                <td class="value">911.50</td>
+                <td class="value">1296.25</td>
+                <td class="value">948.10</td>
+                <td class="value">780</td>
                 <td>
                     <div class="bar-container">
-                        <div class="bar fastest" style="width: 5.0%"></div>
+                        <div class="bar red" style="width: 100.0%"></div>
+                        <span>× 2.9</span>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+  </div>
+  <div class="size-table">
+    <div class="size-title">size = 100</div>
+    <table>
+        <thead>
+            <tr>
+                <th>Variant</th>
+                <th>Mean (μs)</th>
+                <th>Min (μs)</th>
+                <th>Max (μs)</th>
+                <th>Median (μs)</th>
+                <th>Rounds</th>
+                <th>vs Fastest</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Numba</strong></td>
+                <td class="value">2100.81</td>
+                <td class="value">2058.00</td>
+                <td class="value">2508.08</td>
+                <td class="value">2081.75</td>
+                <td class="value">439</td>
+                <td>
+                    <div class="bar-container">
+                        <div class="bar green" style="width: 65.6%"></div>
                         <span>× 1.0</span>
                     </div>
                 </td>
             </tr>
-<tr>
-                <td><strong>Pythonic</strong></td>
-                <td class="value">418.25</td>
-                <td class="value">349.46</td>
-                <td class="value">28386.54</td>
-                <td class="value">353.42</td>
-                <td class="value">2518</td>
-                <td>
-                    <div class="bar-container">
-                        <div class="bar mid" style="width: 21.6%"></div>
-                        <span>× 5.4</span>
-                    </div>
-                </td>
-            </tr>
-<tr>
+            <tr>
                 <td><strong>NetworkX</strong></td>
-                <td class="value">1932.15</td>
-                <td class="value">1809.46</td>
-                <td class="value">8797.58</td>
-                <td class="value">1838.85</td>
-                <td class="value">418</td>
+                <td class="value">3170.41</td>
+                <td class="value">3122.21</td>
+                <td class="value">3261.21</td>
+                <td class="value">3166.92</td>
+                <td class="value">271</td>
                 <td>
                     <div class="bar-container">
-                        <div class="bar slowest" style="width: 100.0%"></div>
-                        <span>× 25.0</span>
-                    </div>
-                </td>
-            </tr>
-</tbody></table>
-<h2>Prim</h2>
-<table>
-            <thead>
-                <tr>
-                    <th>Variant</th>
-                    <th>Mean (μs)</th>
-                    <th>Min (μs)</th>
-                    <th>Max (μs)</th>
-                    <th>Median (μs)</th>
-                    <th>Rounds</th>
-                    <th>Comparison</th>
-                </tr>
-            </thead>
-            <tbody>
-<tr>
-                <td><strong>NetworkX</strong></td>
-                <td class="value">40.50</td>
-                <td class="value">37.04</td>
-                <td class="value">893.54</td>
-                <td class="value">37.83</td>
-                <td class="value">2819</td>
-                <td>
-                    <div class="bar-container">
-                        <div class="bar fastest" style="width: 68.8%"></div>
-                        <span>× 1.0</span>
-                    </div>
-                </td>
-            </tr>
-<tr>
-                <td><strong>Pythonic</strong></td>
-                <td class="value">43.06</td>
-                <td class="value">41.87</td>
-                <td class="value">89.29</td>
-                <td class="value">42.54</td>
-                <td class="value">1708</td>
-                <td>
-                    <div class="bar-container">
-                        <div class="bar mid" style="width: 73.2%"></div>
-                        <span>× 1.1</span>
-                    </div>
-                </td>
-            </tr>
-<tr>
-                <td><strong>Numba</strong></td>
-                <td class="value">58.82</td>
-                <td class="value">39.12</td>
-                <td class="value">125.79</td>
-                <td class="value">40.54</td>
-                <td class="value">5</td>
-                <td>
-                    <div class="bar-container">
-                        <div class="bar slowest" style="width: 100.0%"></div>
+                        <div class="bar yellow" style="width: 99.0%"></div>
                         <span>× 1.5</span>
                     </div>
                 </td>
             </tr>
-</tbody></table>
+            <tr>
+                <td><strong>Pythonic</strong></td>
+                <td class="value">3203.95</td>
+                <td class="value">3173.21</td>
+                <td class="value">3561.54</td>
+                <td class="value">3193.04</td>
+                <td class="value">291</td>
+                <td>
+                    <div class="bar-container">
+                        <div class="bar red" style="width: 100.0%"></div>
+                        <span>× 1.5</span>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+  </div>
+  <div class="size-table">
+    <div class="size-title">size = 200</div>
+    <table>
+        <thead>
+            <tr>
+                <th>Variant</th>
+                <th>Mean (μs)</th>
+                <th>Min (μs)</th>
+                <th>Max (μs)</th>
+                <th>Median (μs)</th>
+                <th>Rounds</th>
+                <th>vs Fastest</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>NetworkX</strong></td>
+                <td class="value">13993.54</td>
+                <td class="value">12326.33</td>
+                <td class="value">52361.46</td>
+                <td class="value">12536.90</td>
+                <td class="value">80</td>
+                <td>
+                    <div class="bar-container">
+                        <div class="bar green" style="width: 79.1%"></div>
+                        <span>× 1.0</span>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td><strong>Pythonic</strong></td>
+                <td class="value">16983.15</td>
+                <td class="value">16844.71</td>
+                <td class="value">17377.12</td>
+                <td class="value">16979.17</td>
+                <td class="value">55</td>
+                <td>
+                    <div class="bar-container">
+                        <div class="bar yellow" style="width: 96.0%"></div>
+                        <span>× 1.2</span>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td><strong>Numba</strong></td>
+                <td class="value">17683.39</td>
+                <td class="value">17257.33</td>
+                <td class="value">18604.75</td>
+                <td class="value">17598.15</td>
+                <td class="value">54</td>
+                <td>
+                    <div class="bar-container">
+                        <div class="bar red" style="width: 100.0%"></div>
+                        <span>× 1.3</span>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+  </div>
+</div>
+
+    <h2 style="margin-top: 3rem;">⚡ Numba Speedup Summary</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Algorithm</th>
+                <th>Size</th>
+                <th>Pythonic → Numba</th>
+                <th>NetworkX → Numba</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Bellman Ford</td>
+                <td>50</td>
+                <td>500.3x</td>
+                <td>12.4x</td>
+            </tr>
+            <tr>
+                <td>Bellman Ford</td>
+                <td>100</td>
+                <td>852.5x</td>
+                <td>9.1x</td>
+            </tr>
+            <tr>
+                <td>Bellman Ford</td>
+                <td>200</td>
+                <td>883.0x</td>
+                <td>4.8x</td>
+            </tr>
+            <tr>
+                <td>Dijkstra</td>
+                <td>50</td>
+                <td>1.7x</td>
+                <td>2.5x</td>
+            </tr>
+            <tr>
+                <td>Dijkstra</td>
+                <td>100</td>
+                <td>3.4x</td>
+                <td>5.5x</td>
+            </tr>
+            <tr>
+                <td>Dijkstra</td>
+                <td>175</td>
+                <td>2.1x</td>
+                <td>3.3x</td>
+            </tr>
+            <tr>
+                <td>Kruskal</td>
+                <td>50</td>
+                <td>5.0x</td>
+                <td>7.1x</td>
+            </tr>
+            <tr>
+                <td>Kruskal</td>
+                <td>100</td>
+                <td>12.5x</td>
+                <td>16.9x</td>
+            </tr>
+            <tr>
+                <td>Kruskal</td>
+                <td>200</td>
+                <td>17.7x</td>
+                <td>27.4x</td>
+            </tr>
+            <tr>
+                <td>Lee</td>
+                <td>50</td>
+                <td>8.4x</td>
+                <td>58.3x</td>
+            </tr>
+            <tr>
+                <td>Lee</td>
+                <td>100</td>
+                <td>12.5x</td>
+                <td>88.3x</td>
+            </tr>
+            <tr>
+                <td>Lee</td>
+                <td>200</td>
+                <td>12.9x</td>
+                <td>96.8x</td>
+            </tr>
+            <tr>
+                <td>Prim</td>
+                <td>50</td>
+                <td>2.7x</td>
+                <td>2.9x</td>
+            </tr>
+            <tr>
+                <td>Prim</td>
+                <td>100</td>
+                <td>1.5x</td>
+                <td>1.5x</td>
+            </tr>
+            <tr>
+                <td>Prim</td>
+                <td>200</td>
+                <td>1.0x</td>
+                <td>0.8x</td>
+            </tr>
+        </tbody>
+    </table>
 
     <div class="footer">
-        Generated by optiVLSI benchmark suite | 2026-06-14T22:22:04+05:30
+        Generated by optiVLSI benchmark suite | 2026-06-14T22:44:25+05:30
     </div>
 </body>
 </html>
