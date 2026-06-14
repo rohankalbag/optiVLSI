@@ -1,34 +1,129 @@
-# OptiVLSI
+# optiVLSI
 
-*Very Large Scale Integration abbreviated as VLSI involves digital circuits dealing with billions of transistors, and
-requires computerized design automation, design verification and testing algorithms. Digital circuits are often
-represented using graphs, where the logic gates are nodes and their interconnections are the edges. Since VLSI
-circuits have millions of logic gates, there is a need for fast and highly optimized graph algorithms. There are a
-few optimized graph libraries with optimized basic graph operations such as `networkx`, but there are no optimized
-and high performance open source libraries which build upon these to specifically cater to the VLSI computer
-aided design automation industry.*
+optiVLSI is a Python package that implements a collection of classic graph and circuit algorithms, including:
 
+- Bellman‑Ford
+- Dijkstra
+- Prim
+- Kruskal
+- Lee (maze solver)
+- BDD (binary decision diagrams)
+- Simulation engines (compiled‑code and event‑driven)
 
-## Initially Implemented Optimised Implementations/Algorithms (Documentation can be found [here](https://github.com/rohankalbag/optiVLSI/blob/main/OptiVLSI.pdf))
+The project has been refactored into a proper Python package with a modern `pyproject.toml`, type hints, comprehensive tests, documentation, and CI/CD pipelines.
 
-- [Lee Algorithm](https://github.com/rohankalbag/optiVLSI/tree/main/lee-algorithm)
-- [Kruskal's Algorithm](https://github.com/rohankalbag/optiVLSI/tree/main/kruskal)
-- [Binary Decision Diagrams](https://github.com/rohankalbag/optiVLSI/tree/main/ROBDD)
-- [Bellman-Ford Algorithm](https://github.com/rohankalbag/optiVLSI/tree/main/bellman-ford)
-- [Prim Algorithm](https://github.com/rohankalbag/optiVLSI/tree/main/prim)
-- [Dijkstra's Algorithm](https://github.com/rohankalbag/optiVLSI/tree/main/dijkstra)
-- [Compiled Code Simulator](https://github.com/rohankalbag/optiVLSI/tree/main/compiled-code-simulator)
-- [Event Driven Simulator](https://github.com/rohankalbag/optiVLSI/tree/main/event-driven-sim)
+## Quick Start
 
-### Optimization Tools Used
-- Numba: All the algorithms that are implemented have been accelerated using numba and their runtimes have
-been compared with pythonic and other implementations
-- Automan: To automate simulations, benchmark algorithms, several circuits/graphs of varying sizes were used
-and results for the same were generated using automan
+```bash
+# Install the package
+pip install optivlsi
 
+# Run a quick demo
+python -m optivlsi.lee.algorithms.lee_algorithm
+```
 
-##### This open-source codebase started as a course project for the course offered at IIT Bombay, AE6102 - Parallel Scientific Computing and Visualization. We are open to more open-source contributions
+## Documentation
 
-### Collaborators
+- [API Reference](docs/api.md)
+- [Algorithms Overview](docs/algorithms.md)
+- [Benchmarks](docs/benchmarks.md)
+
+## Contributing
+
+See the [CONTRIBUTING.md](CONTRIBUTING.md) file for guidelines.
+
+## Implemented Algorithms
+
+### Graph Algorithms
+| Algorithm | Package | Variants |
+|-----------|---------|----------|
+| Bellman-Ford Shortest Path | `optivlsi.bellman_ford` | Pythonic, NetworkX, Numba |
+| Dijkstra Shortest Path | `optivlsi.dijkstra` | Pythonic, NetworkX, Numba |
+| Kruskal Minimum Spanning Tree | `optivlsi.kruskal` | Pythonic (DSU), NetworkX, Numba |
+| Prim Minimum Spanning Tree | `optivlsi.prim` | Pythonic, NetworkX, Numba |
+
+### Routing
+| Algorithm | Package | Variants |
+|-----------|---------|----------|
+| Lee Maze Routing | `optivlsi.lee` | Pythonic BFS, NetworkX, Numba |
+
+### Digital Circuit Simulation
+| Algorithm | Package | Variants |
+|-----------|---------|----------|
+| Compiled-Code Simulator | `optivlsi.simulation.compiled_code` | Gate classes, Numba |
+| Event-Driven Simulator | `optivlsi.simulation.event_driven` | Event propagation, Numba |
+
+### Binary Decision Diagrams
+| Algorithm | Package | Variants |
+|-----------|---------|----------|
+| ROBDD | `optivlsi.bdd` | Python, Numba |
+
+## Running Tests
+
+```bash
+# Run all tests
+pytest
+
+# Run with coverage
+pytest --cov=optivlsi --cov-report=term
+
+# Run benchmarks
+pytest tests/test_benchmarks.py --benchmark-only
+```
+
+## Documentation
+
+Full documentation is available in the [docs/](docs/) directory:
+
+- [API Reference](docs/api.md)
+- [Algorithm Details](docs/algorithms.md)
+
+Detailed research paper: [OptiVLSI.pdf](OptiVLSI.pdf)
+
+## Benchmarking
+
+Each algorithm module includes an `automate.py` file for automan-based benchmarking across various problem sizes. The package also provides pytest-benchmark integration for performance regression detection.
+
+## Optimization Tools Used
+
+- **Numba**: All algorithms have Numba-accelerated variants with JIT compilation
+- **Automan**: Automated simulation and benchmarking infrastructure
+- **NetworkX**: Reference implementations using standard graph library
+
+## Project Structure
+
+```
+optivlsi/                   # Main package
+├── bellman_ford/           # Bellman-Ford algorithm
+├── dijkstra/               # Dijkstra's algorithm
+├── kruskal/                # Kruskal's MST
+├── prim/                   # Prim's MST
+├── lee/                    # Lee maze routing
+├── simulation/
+│   ├── compiled_code/      # Compiled-code simulator
+│   ├── compiled_code_numba/# Numba-accelerated variant
+│   └── event_driven/       # Event-driven simulator
+├── bdd/                    # ROBDD
+└── utils/                  # Shared utilities
+bellman-ford/               # Original standalone modules
+dijkstra/                   # (preserved for reproducibility)
+kruskal/                    #
+prim/                       #
+lee-algorithm/              #
+compiled-code-simulator/    #
+event-driven-sim/           #
+ROBDD/                      #
+```
+
+## Original Research
+
+This open-source codebase started as a course project for **AE6102 - Parallel Scientific Computing and Visualization** at IIT Bombay. The original standalone research modules are preserved in their respective directories.
+
+## Collaborators
+
 - Rohan Rajesh Kalbag
 - Neeraj Prabhu
+
+## License
+
+MIT

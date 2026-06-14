@@ -1,0 +1,7 @@
+include README.md
+include LICENSE
+include pyproject.toml
+recursive-include optivlsi *.py
+recursive-include tests *.py
+recursive-include examples *.py
+recursive-include docs *.mdinclude LICENSE
