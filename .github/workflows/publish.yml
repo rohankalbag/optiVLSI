@@ -8,9 +8,6 @@ on:
 jobs:
   build-and-publish:
     runs-on: ubuntu-latest
-    permissions:
-      id-token: write
-      contents: read
 
     steps:
     - uses: actions/checkout@v4
@@ -31,12 +28,8 @@ jobs:
     - name: Check distribution packages
       run: twine check dist/*
 
-    - name: Publish to Test PyPI
-      uses: pypa/gh-action-pypi-publish@release/v1
-      with:
-        repository-url: https://test.pypi.org/legacy/
-        skip-existing: true
-
     - name: Publish to PyPI
-      if: github.event_name == 'release'
-      uses: pypa/gh-action-pypi-publish@release/v1
+      env:
+        TWINE_USERNAME: __token__
+        TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+      run: twine upload dist/*

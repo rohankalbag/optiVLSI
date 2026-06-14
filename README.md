@@ -24,13 +24,13 @@ python -m optivlsi.lee.algorithms.lee_algorithm
 
 ## Documentation
 
-- [API Reference](docs/api.md)
-- [Algorithms Overview](docs/algorithms.md)
-- [Benchmarks](docs/benchmarks.md)
+- [API Reference](https://github.com/rohankalbag/optiVLSI/blob/main/docs/api.md)
+- [Algorithms Overview](https://github.com/rohankalbag/optiVLSI/blob/main/docs/algorithms.md)
+- [Benchmarks](https://github.com/rohankalbag/optiVLSI/blob/main/docs/benchmarks.md)
 
 ## Contributing
 
-See the [CONTRIBUTING.md](CONTRIBUTING.md) file for guidelines.
+See the [CONTRIBUTING.md](https://github.com/rohankalbag/optiVLSI/blob/main/CONTRIBUTING.md) file for guidelines.
 
 ## Implemented Algorithms
 
@@ -73,12 +73,12 @@ pytest tests/test_benchmarks.py --benchmark-only
 
 ## Documentation
 
-Full documentation is available in the [docs/](docs/) directory:
+Full documentation is available in the [docs/](https://github.com/rohankalbag/optiVLSI/tree/main/docs) directory:
 
-- [API Reference](docs/api.md)
-- [Algorithm Details](docs/algorithms.md)
+- [API Reference](https://github.com/rohankalbag/optiVLSI/blob/main/docs/api.md)
+- [Algorithm Details](https://github.com/rohankalbag/optiVLSI/blob/main/docs/algorithms.md)
 
-Detailed research paper: [OptiVLSI.pdf](OptiVLSI.pdf)
+Detailed research paper: [OptiVLSI.pdf](https://github.com/rohankalbag/optiVLSI/blob/main/OptiVLSI.pdf)
 
 ## Benchmarking
 
