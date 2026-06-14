@@ -139,30 +139,29 @@ def prim_numba_accelerated(nodes, edges, mst):
         Tuple of (nodes, mst_edges) for the minimum spanning tree.
     """
     mst = []
-    visited = []
     curr_node = nodes[0]
-    visited.append(curr_node)
-    cond1 = np.array([False]*len(edges[:, 0]))
-    cond2 = np.array([False]*len(edges[:, 0]))
-
+    n_edges = edges.shape[0]
+    cond1 = np.zeros(n_edges, dtype=np.bool_)
+    cond2 = np.zeros(n_edges, dtype=np.bool_)
     cond1 = cond1 | (edges[:, 0] == curr_node)
     cond2 = cond2 | (edges[:, 1] == curr_node)
 
-    for i in range(len(nodes)):
-
-        if (~(np.any((~cond1) | (~cond2)))):
+    for _ in range(len(nodes)):
+        if not np.any((~cond1) | (~cond2)):
             break
 
-        connected_edges = edges[(cond1 & (~cond2)) | ((~cond1) & (cond2)), :]
-        connected_edges_wts = connected_edges[:, 2]
-        min_wt_index = np.argmin(connected_edges_wts)
-        visited.append(connected_edges[min_wt_index, 1])
-        curr_node = connected_edges[min_wt_index, 1]
-        mst.append(connected_edges[min_wt_index, :])
+        mask = (cond1 & (~cond2)) | ((~cond1) & (cond2))
+        connected_edges = edges[mask, :]
+        connected_wts = connected_edges[:, 2]
+        min_idx = np.argmin(connected_wts)
+        min_edge = connected_edges[min_idx]
 
+        curr_node = min_edge[1]
+        mst.append(min_edge)
         cond1 = cond1 | (edges[:, 0] == curr_node)
         cond2 = cond2 | (edges[:, 1] == curr_node)
-        curr_node = connected_edges[min_wt_index, 0]
+
+        curr_node = min_edge[0]
         cond1 = cond1 | (edges[:, 0] == curr_node)
         cond2 = cond2 | (edges[:, 1] == curr_node)
 

@@ -167,39 +167,35 @@ def dijkstra_numba_accelerated(nodes, edges, src, end, priority_queue, path):
     Returns:
         Tuple of (status, path) where status is 1 if path found, -1 otherwise.
     """
-    visited = np.zeros_like(nodes)
-    distance = np.ones_like(nodes)
-    next_hop = np.zeros_like(nodes)
-
-    next_hop.fill(-1)
-    distance.fill(np.iinfo(np.int64).max)
+    n = len(nodes)
+    visited = np.zeros(n, dtype=np.bool_)
+    distance = np.full(n, np.iinfo(np.int64).max, dtype=np.int64)
+    next_hop = np.full(n, -1, dtype=np.int64)
 
     visited[src] = True
     distance[src] = 0
 
-    for e in edges:
-        if e[0] == src:
-            heapq.heappush(priority_queue, (e[2], src, e[1]))
+    for i in range(edges.shape[0]):
+        if edges[i, 0] == src:
+            heapq.heappush(priority_queue, (edges[i, 2], src, edges[i, 1]))
 
-    while (len(priority_queue) > 0):
+    while len(priority_queue) > 0:
         wt, start, n_end = heapq.heappop(priority_queue)
-        if (visited[n_end] == 0):
-            visited[n_end] = 1
+        if not visited[n_end]:
+            visited[n_end] = True
             distance[n_end] = wt
             next_hop[n_end] = start
 
-            for e in edges:
-                if e[0] == n_end:
-                    if not visited[e[1]]:
-                        heapq.heappush(
-                            priority_queue, (wt + e[2], n_end, e[1]))
+            for i in range(edges.shape[0]):
+                if edges[i, 0] == n_end and not visited[edges[i, 1]]:
+                    heapq.heappush(priority_queue, (wt + edges[i, 2], n_end, edges[i, 1]))
 
-    if (not visited[end]):
+    if not visited[end]:
         return (-1, None)
-    else:
-        x = end
-        while next_hop[x] != -1:
-            path.append(x)
-            x = next_hop[x]
+
+    x = end
+    while next_hop[x] != -1:
         path.append(x)
-        return (1, path)
+        x = next_hop[x]
+    path.append(x)
+    return (1, path)
