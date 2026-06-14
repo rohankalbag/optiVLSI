@@ -84,6 +84,9 @@ Detailed research paper: [OptiVLSI.pdf](https://github.com/rohankalbag/optiVLSI/
 
 Each algorithm module includes an `automate.py` file for automan-based benchmarking across various problem sizes. The package also provides pytest-benchmark integration for performance regression detection.
 
+A live benchmark comparison report is automatically generated on every push:  
+👉 **[View Benchmark Report](https://rohankalbag.github.io/optiVLSI/benchmark_report.html)**
+
 ## Optimization Tools Used
 
 - **Numba**: All algorithms have Numba-accelerated variants with JIT compilation
